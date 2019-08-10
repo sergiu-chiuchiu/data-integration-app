@@ -18,4 +18,9 @@ public class Price {
     Long price;
     @Enumerated(EnumType.STRING)
     CurrencyType currencyType;
+
+    @ManyToOne()
+    AdvertisementPage advertisementPage;
+
+
 }

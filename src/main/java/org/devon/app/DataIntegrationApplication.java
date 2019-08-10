@@ -9,6 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class DataIntegrationApplication implements CommandLineRunner {
+
+    @Autowired
+    FlowExecutionManager executionManager;
     private static Logger LOG = LoggerFactory
             .getLogger(DataIntegrationApplication.class);
 
@@ -21,12 +24,11 @@ public class DataIntegrationApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         LOG.info("EXECUTING : command line runner");
-
-        FlowExecutionManager.execute();
-
         for (int i = 0; i < args.length; ++i) {
             LOG.info("args[{}]: {}", i, args[i]);
         }
+
+        executionManager.execute();
     }
 
 }
