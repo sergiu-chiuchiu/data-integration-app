@@ -1,5 +1,6 @@
 package org.devon.app.entities;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,12 +12,13 @@ import javax.persistence.Id;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-public class Test {
+public class Area {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Integer usefulArea;
+    Integer builtSurface;
+    Integer totalUsefulArea;
 
-    private String test = "hello";
-    private Integer no = 12;
+
 }
