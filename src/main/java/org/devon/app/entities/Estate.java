@@ -17,11 +17,10 @@ public class Estate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-
     Partitioning partitioning;
     Integer floor;
     ComfortType comfortType;
-    String state;
+    String estateState;
     String propertyType;
     String city;
     String neighbourhood;

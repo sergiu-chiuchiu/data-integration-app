@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdvertisementPageTTransformer extends AdvertisementPageTransformer {
 
-    String state;
-    String propertyType;
+    private String state;
+    private String propertyType;
 
     public void setState(String state) {
         this.state = state;

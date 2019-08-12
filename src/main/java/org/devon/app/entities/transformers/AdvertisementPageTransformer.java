@@ -2,49 +2,55 @@ package org.devon.app.entities.transformers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public abstract class AdvertisementPageTransformer {
 
-    String pageTitle;
-    String zone;
-    String price;
-    Integer noOfRooms;
-    String usefulArea;
-    String builtSurface;
-    String partitioning;
-    String floor;
-    String totalFloors;
-    Integer noOfBathrooms;
-    String constructionYear;
-    String pageId;
-    String lastUpdated;
-    String image1;
-    String image2;
+    private String pageTitle;
+    private String city;
+    private String neighbourhood;
+    private List<String> priceList;
+    private Integer noOfRooms;
+    private Double usefulArea;
+    private Double builtSurface;
+    private String partitioning;
+    private Integer floorNo;
+    private Integer totalFloors;
+    private Integer noOfBathrooms;
+    private String constructionYear;
+    private String pageId;
+    private String lastUpdated;
+    private String image1;
+    private String image2;
+
+    public void setNeighbourhood(String neighbourhood) {
+        this.neighbourhood = neighbourhood;
+    }
 
     public void setPageTitle(String pageTitle) {
         this.pageTitle = pageTitle;
     }
 
-    public void setZone(String zone) {
-        this.zone = zone;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public void setPrice(String price) {
-        this.price = price;
+    public void setPriceList(List<String> priceList) {
+        this.priceList = priceList;
     }
 
     public void setNoOfRooms(Integer noOfRooms) {
         this.noOfRooms = noOfRooms;
     }
 
-    public void setUsefulArea(String usefulArea) {
+    public void setUsefulArea(Double usefulArea) {
         this.usefulArea = usefulArea;
     }
 
-    public void setBuiltSurface(String builtSurface) {
+    public void setBuiltSurface(Double builtSurface) {
         this.builtSurface = builtSurface;
     }
 
@@ -52,11 +58,11 @@ public abstract class AdvertisementPageTransformer {
         this.partitioning = partitioning;
     }
 
-    public void setFloor(String floor) {
-        this.floor = floor;
+    public void setFloorNo(Integer floorNo) {
+        this.floorNo = floorNo;
     }
 
-    public void setTotalFloors(String totalFloors) {
+    public void setTotalFloors(Integer totalFloors) {
         this.totalFloors = totalFloors;
     }
 
