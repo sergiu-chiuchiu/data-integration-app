@@ -4,27 +4,33 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.devon.app.entities.decorators.AdvertisementPageDecorator;
+import org.devon.app.entities.AdvertisementPage;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
+import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
+import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
-@Component
+@Service
 public class IntegrationServiceM implements IintegrationService {
     private static Logger LOG = LoggerFactory
             .getLogger(IntegrationServiceM.class);
 
-    @Override
-    public List<Class<? extends AdvertisementPageDecorator>> mapStreamToTransformer(BufferedReader br) {
+    @Autowired
+    AdvertisementPageRepository advertisementPageRepository;
 
+    @Override
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
             CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
             CSVReader csvReader = new CSVReaderBuilder(br).withCSVParser(parser).build();
@@ -38,35 +44,72 @@ public class IntegrationServiceM implements IintegrationService {
             while ((nextRecord = csvReader.readNext()) != null) {
                 System.out.println("<-- " + String.valueOf(cnt++) + " -->");
 
+                AdvertisementPageMTransformer mTransformer = new AdvertisementPageMTransformer();
+                mTransformer.setPageSource("M");
                 int c = 0;
                 for (String cell : nextRecord) {
-                    mapItemToTransformer(header.get(c), nextRecord[c]);
+                    mapItemToTransformer(header.get(c), nextRecord[c], mTransformer);
                     c++;
 //                    System.out.print(cell + " == " + String.valueOf(c) + " == \t");
                 }
+
+                Boolean isDuplicateWithin = checkForDuplicatesWithin(mTransformer);
+                if (isDuplicateWithin) {
+                    Boolean isModifiedRecord = checkForRecordUpdate(mTransformer);
+                    if (isModifiedRecord) {
+                        AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                        advertisementPageRepository.save(ap);
+                    }
+                } else {
+                    Boolean isDuplicateBetween = checkForDuplicatesBetween(mTransformer);
+                    if (!isDuplicateBetween) {
+                        AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                        advertisementPageRepository.save(ap);
+                    }
+                }
             }
-
-
-//            String rawHeader = br.readLine();
-//            List<String> header = Arrays.asList(rawHeader.split("\\^"));
-//            header.set(0, header.get(0).substring(1));
-//
-//            System.out.println(rawHeader);
-//
-//            List<String> csvLineItems;
-//            while (br.ready()) {
-//                csvLineItems = Arrays.asList(br.readLine().split("\\^"));
-//
-//                mapItemToTransformer(header, csvLineItems);
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private void mapItemToTransformer(String header, String item) {
-        AdvertisementPageMTransformer mTransformer = new AdvertisementPageMTransformer();
+    @Override
+    public <E extends AdvertisementPageTransformer> Boolean checkForDuplicatesWithin(E mTransformer) {
+        List<AdvertisementPage> advertisementPageList = advertisementPageRepository.findByPageSource(mTransformer.getPageSource());
+
+        for (AdvertisementPage ap : advertisementPageList) {
+            if (mTransformer.getPageId().equals(ap.getPageId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E mTransfomer) {
+        AdvertisementPage ap = advertisementPageRepository.findByPageId(mTransfomer.getPageId());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        Boolean isDateEqual = sdf.format(ap.getEditDate().getTime()).equals(sdf.format(mTransfomer.getLastUpdated().getTime()));
+        if(isDateEqual) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public <E extends AdvertisementPageTransformer> AdvertisementPage mapTransformerToEntities(E apTr) {
+        AdvertisementPage ap = new AdvertisementPage();
+
+        ap.setPageTitle(apTr.getPageTitle());
+
+        ap.setEstate();
+
+        return ap;
+    }
+
+    private void mapItemToTransformer(String header, String item, AdvertisementPageMTransformer mTransformer) {
         try {
             if (item.equals("")) {
                 throw new EmptyFieldException(header + " field is empty");
@@ -103,58 +146,67 @@ public class IntegrationServiceM implements IintegrationService {
                     break;
                 case "Partitioning":
 //                    System.out.println("good " + item);
-                    mTransformer.setPartitioning(item);
+                    mTransformer.setPartitioning(item.trim());
                     break;
                 case "Comfort":
 //                    System.out.println("good " + item);
-                    mTransformer.setPartitioning(item);
+                    mTransformer.setComfort(item.trim());
                     break;
                 case "Floor":
 //                    System.out.println("good " + item);
                     mTransformer.convertFloorItem(item);
                     break;
-//                case "NoOfKitchens":
+                case "NoOfKitchens":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "NoOfBathrooms":
+                    mTransformer.setNoOfKitchens(Integer.valueOf(item));
+                    break;
+                case "NoOfBathrooms":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "ConstructionYear":
+                    mTransformer.setNoOfBathrooms(Integer.valueOf(item));
+                    break;
+                case "ConstructionYear":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "ResistanceStructure":
+                    mTransformer.convertToConstructionYear(item);
+                    break;
+                case "ResistanceStructure":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "BuildingType":
+                    mTransformer.setResistanceStructure(item.trim());
+                    break;
+                case "BuildingType":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "TotalFloors":
+                    mTransformer.setBuildingType(item.trim());
+                    break;
+                case "TotalFloors":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "NoOfBalconies":
+//                    mTransformer.setTotalFloors();
+                    break;
+                case "NoOfBalconies":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "PageId":
+                    mTransformer.convertToNoOfBalconies(item);
+                    break;
+                case "PageId":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "LastUpdate":
+                    mTransformer.setPageId(item.trim());
+                    break;
+                case "LastUpdate":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "Image1":
+                    mTransformer.convertToLastUpdated(item);
+                    break;
+                case "Image1":
 //                    System.out.println("good " + item);
-//                    break;
-//                case "Image2":
+                    mTransformer.setImage1(item.trim());
+                    break;
+                case "Image2":
 //                    System.out.println("good " + item);
-//                    break;
-//                default:
-//                    System.out.println("Error"); break;
-
+                    mTransformer.setImage2(item);
+                    break;
+                default:
+                    LOG.error("The header " + header + " could not be matched with a case");
+                    break;
             }
         } catch (EmptyFieldException e) {
             LOG.warn(header + " field is empty");
         }
-
-
     }
 
 }

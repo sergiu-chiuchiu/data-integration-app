@@ -1,6 +1,6 @@
 package org.devon.app.services.impl;
 
-import org.devon.app.entities.decorators.AdvertisementPageDecorator;
+import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.services.IintegrationService;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public class IntegrationServiceT implements IintegrationService {
 
     @Override
-    public List<Class<? extends AdvertisementPageDecorator>> mapStreamToTransformer(BufferedReader br) {
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         return null;
     }
 }
