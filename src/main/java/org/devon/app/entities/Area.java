@@ -1,20 +1,19 @@
 package org.devon.app.entities;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+//@NoArgsConstructor
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Setter(value = AccessLevel.PACKAGE)
 @Builder
 public class Area {
     @Id
@@ -24,6 +23,5 @@ public class Area {
     Double usefulArea;
     Double builtSurface;
     Double totalUsefulArea;
-
 
 }

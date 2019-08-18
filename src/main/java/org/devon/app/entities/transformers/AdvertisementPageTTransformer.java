@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdvertisementPageTTransformer extends AdvertisementPageTransformer {
 
-    private String state;
+    private String EstateState;
     private String propertyType;
 
 }

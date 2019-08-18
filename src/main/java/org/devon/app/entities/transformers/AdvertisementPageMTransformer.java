@@ -51,15 +51,17 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
             price = prices.substring(0, prices.indexOf("RON") + 3);
             prices = prices.replace(price, "");
-            priceList.put("RON", Double.parseDouble(price));
+            price = price.replace(" RON", "").trim();
+            priceList.put("RON", Double.valueOf(price));
 
             price = prices.substring(0, prices.indexOf("USD") + 3);
             prices = prices.replace(price, "");
-            priceList.put("USD", Double.parseDouble(price));
+            price = price.replace(" USD", "").trim();
+            priceList.put("USD", Double.valueOf(price));
 
             price = prices.substring(0, prices.indexOf("EUR") + 3);
-            prices = prices.replace(price, "");
-            priceList.put("EUR", Double.parseDouble(price));
+            price = price.replace(" EUR", "").trim();
+            priceList.put("EUR", Double.valueOf(price));
 
             super.setPriceList(priceList);
         } catch (Exception ex) {

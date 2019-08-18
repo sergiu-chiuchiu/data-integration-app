@@ -8,9 +8,9 @@ import java.io.BufferedReader;
 import java.util.List;
 
 @Service
-public class IntegrationServiceT implements IintegrationService {
+public class IntegrationServiceT  { //TODO
 
-    @Override
+    //TODO
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         return null;
     }

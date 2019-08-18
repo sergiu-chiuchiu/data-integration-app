@@ -10,6 +10,9 @@ public interface IintegrationService {
 
     List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br);
 
+
+    <E, F extends AdvertisementPageTransformer> E checkForDuplicatesBetween(F mTransformer);
+
     <E extends AdvertisementPageTransformer> Boolean checkForDuplicatesWithin (E apTransformer);
 
     <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E apTransformer);

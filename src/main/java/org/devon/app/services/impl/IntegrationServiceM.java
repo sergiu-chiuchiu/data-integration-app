@@ -10,6 +10,7 @@ import org.devon.app.entities.enums.CurrencyType;
 import org.devon.app.entities.enums.PageSource;
 import org.devon.app.entities.enums.Partitioning;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
+import org.devon.app.entities.transformers.AdvertisementPageTTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
@@ -67,16 +68,16 @@ public class IntegrationServiceM implements IintegrationService {
                         advertisementPageRepository.save(ap);
                     }
                 } else {
-                    Boolean isDuplicateBetween = checkForDuplicatesBetween(mTransformer);
-                    if (!isDuplicateBetween) {
+                    AdvertisementPageTTransformer duplicateAP = checkForDuplicatesBetween(mTransformer);
+                    if (duplicateAP == null) {
                         AdvertisementPage ap = mapTransformerToEntities(mTransformer);
                         advertisementPageRepository.save(ap);
                     } else {
-                        Boolean isModifiedRecord = checkForRecordUpdate(mTransformer);
-                        if (isModifiedRecord) {
-                            AdvertisementPage ap = mapTransformerToEntities(mTransformer);
-                            advertisementPageRepository.save(ap);
-                        }
+//                        Boolean isModifiedRecord = checkForRecordBetweenUpdate(mTransformer, duplicateAP);
+//                        if (isModifiedRecord) {
+//                            AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+//                            advertisementPageRepository.save(ap);
+//                        }
                     }
                 }
             }
@@ -87,8 +88,16 @@ public class IntegrationServiceM implements IintegrationService {
     }
 
     @Override
+    public <E, F extends AdvertisementPageTransformer> E checkForDuplicatesBetween(F mTransformer) {
+
+
+        //TOOD
+        return null;
+    }
+
+    @Override
     public <E extends AdvertisementPageTransformer> Boolean checkForDuplicatesWithin(E mTransformer) {
-        List<AdvertisementPage> advertisementPageList = advertisementPageRepository.findByPageSource(mTransformer.getPageSource());
+        List<AdvertisementPage> advertisementPageList = advertisementPageRepository.findByPageSource(PageSource.fromString(mTransformer.getPageSource()));
 
         for (AdvertisementPage ap : advertisementPageList) {
             if (mTransformer.getPageId().equals(ap.getPageId())) {
@@ -145,11 +154,21 @@ public class IntegrationServiceM implements IintegrationService {
                 .rooms(rooms)
                 .build();
 
+        AdvertisementPage ap = AdvertisementPage.builder()
+                .pageTitle(apTr.getPageTitle())
+                .estate(estate)
+                .pageId(apTr.getPageId())
+                .editDate(apTr.getLastUpdated())
+                .pageSource(PageSource.fromString(apTr.getPageSource()))
+                .build();
+
+
         List<Price> priceList = new ArrayList<>();
         for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
             Price p = Price.builder()
                     .currencyType(CurrencyType.fromString(priceEntry.getKey()))
                     .price(priceEntry.getValue())
+                    .advertisementPage(ap)
                     .build();
             priceList.add(p);
         }
@@ -157,22 +176,17 @@ public class IntegrationServiceM implements IintegrationService {
         List<Image> imageList = new ArrayList<>();
         Image image = Image.builder()
                 .imageName(apTr.getImage1())
+                .advertisementPage(ap)
                 .build();
         imageList.add(image);
         image = Image.builder()
                 .imageName(apTr.getImage2())
+                .advertisementPage(ap)
                 .build();
         imageList.add(image);
 
-        AdvertisementPage ap = AdvertisementPage.builder()
-                .pageTitle(apTr.getPageTitle())
-                .estate(estate)
-                .priceList(priceList)
-                .pageId(apTr.getPageId())
-                .editDate(apTr.getLastUpdated())
-                .pageSource(PageSource.fromString(apTr.getPageSource()))
-                .imageList(imageList)
-                .build();
+        ap.setImageList(imageList);
+        ap.setPriceList(priceList);
 
         return ap;
     }
