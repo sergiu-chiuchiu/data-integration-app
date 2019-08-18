@@ -23,7 +23,7 @@ public class Estate {
     ComfortType comfortType;
     String estateState;
     String propertyType;
-    String city;
+    String region;
     String neighbourhood;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

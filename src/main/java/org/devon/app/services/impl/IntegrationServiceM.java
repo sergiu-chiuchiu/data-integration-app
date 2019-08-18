@@ -147,7 +147,7 @@ public class IntegrationServiceM implements IintegrationService {
         Estate estate = Estate.builder()
                 .partitioning(Partitioning.fromString(apTr.getPartitioning()))
                 .comfortType(ComfortType.fromString(apTr.getComfort()))
-                .city(apTr.getCity())
+                .region(apTr.getRegion())
                 .neighbourhood(apTr.getNeighbourhood())
                 .area(area)
                 .construction(construction)

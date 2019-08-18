@@ -34,10 +34,10 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
             zone = zone.substring(0, idx);
 
             idx = zone.indexOf(", zona");
-            String city = zone.substring(0, idx).trim();
+            String region = zone.substring(0, idx).trim();
             String neighbourhood = zone.substring(idx + 6).trim();
 
-            super.setCity(city);
+            super.setRegion(region);
             super.setNeighbourhood(neighbourhood);
         } catch (Exception ex) {
             ex.printStackTrace();

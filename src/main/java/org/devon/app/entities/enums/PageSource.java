@@ -1,7 +1,7 @@
 package org.devon.app.entities.enums;
 
 public enum PageSource {
-    M, S;
+    M, T;
 
     public static PageSource fromString(String pgSrc) {
         for (PageSource ps : PageSource.values()) {

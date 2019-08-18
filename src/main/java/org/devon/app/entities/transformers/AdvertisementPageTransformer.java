@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class AdvertisementPageTransformer {
 
     private String pageTitle;
-    private String city;
+    private String region;
     private String neighbourhood;
     private Map<String, Double> priceList;
     private Integer noOfRooms;

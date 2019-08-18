@@ -10,12 +10,16 @@ import java.io.*;
 @Component
 public class FlowExecutionManager {
 
-    @Qualifier("integrationServiceM")
+//    @Qualifier("integrationServiceM")
+    @Qualifier("integrationServiceT")
     @Autowired
     private IintegrationService integrationService;
 
     public void execute() {
-        File tstFile = new File("../../UiPathProjects/WebCrawlerIm/myData.csv");
+//        File tstFile = new File("../../UiPathProjects/WebCrawlerIm/myData.csv");
+        File tstFile = new File("../../UiPathProjects/WebCrawlerSt/myDataSt.csv");
+
+
         BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(tstFile));
