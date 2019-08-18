@@ -21,9 +21,9 @@ public class Area {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    Integer usefulArea;
-    Integer builtSurface;
-    Integer totalUsefulArea;
+    Double usefulArea;
+    Double builtSurface;
+    Double totalUsefulArea;
 
 
 }

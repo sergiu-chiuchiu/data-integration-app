@@ -17,7 +17,7 @@ public class Price {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    Long price;
+    Double price;
     @Enumerated(EnumType.STRING)
     CurrencyType currencyType;
 

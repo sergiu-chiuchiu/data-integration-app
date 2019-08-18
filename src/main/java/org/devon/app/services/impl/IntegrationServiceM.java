@@ -4,7 +4,11 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.devon.app.entities.AdvertisementPage;
+import org.devon.app.entities.*;
+import org.devon.app.entities.enums.ComfortType;
+import org.devon.app.entities.enums.CurrencyType;
+import org.devon.app.entities.enums.PageSource;
+import org.devon.app.entities.enums.Partitioning;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
@@ -18,8 +22,10 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class IntegrationServiceM implements IintegrationService {
@@ -65,6 +71,12 @@ public class IntegrationServiceM implements IintegrationService {
                     if (!isDuplicateBetween) {
                         AdvertisementPage ap = mapTransformerToEntities(mTransformer);
                         advertisementPageRepository.save(ap);
+                    } else {
+                        Boolean isModifiedRecord = checkForRecordUpdate(mTransformer);
+                        if (isModifiedRecord) {
+                            AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                            advertisementPageRepository.save(ap);
+                        }
                     }
                 }
             }
@@ -99,12 +111,68 @@ public class IntegrationServiceM implements IintegrationService {
     }
 
     @Override
-    public <E extends AdvertisementPageTransformer> AdvertisementPage mapTransformerToEntities(E apTr) {
-        AdvertisementPage ap = new AdvertisementPage();
+    public <E extends AdvertisementPageTransformer> AdvertisementPage mapTransformerToEntities(E advertisementPageTransformer) {
+        AdvertisementPageMTransformer apTr = (AdvertisementPageMTransformer) advertisementPageTransformer;
 
-        ap.setPageTitle(apTr.getPageTitle());
+        Area area = Area.builder()
+                .usefulArea(apTr.getUsefulArea())
+                .builtSurface(apTr.getBuiltSurface())
+                .totalUsefulArea(apTr.getTotalUsefulArea())
+                .build();
 
-        ap.setEstate();
+        Construction construction = Construction.builder()
+                .constructionYear(apTr.getConstructionYear())
+                .resistanceStructure(apTr.getResistanceStructure())
+                .buildingType(apTr.getBuildingType())
+                .floor(apTr.getFloorNo())
+                .totalNoOfFloors(apTr.getTotalFloors())
+                .build();
+
+        Rooms rooms = Rooms.builder()
+                .noOfRooms(apTr.getNoOfRooms())
+                .noOfKitchens(apTr.getNoOfKitchens())
+                .noOfBalconies(apTr.getNoOfBalconies())
+                .noOfBathrooms(apTr.getNoOfBathrooms())
+                .build();
+
+        Estate estate = Estate.builder()
+                .partitioning(Partitioning.fromString(apTr.getPartitioning()))
+                .comfortType(ComfortType.fromString(apTr.getComfort()))
+                .city(apTr.getCity())
+                .neighbourhood(apTr.getNeighbourhood())
+                .area(area)
+                .construction(construction)
+                .rooms(rooms)
+                .build();
+
+        List<Price> priceList = new ArrayList<>();
+        for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
+            Price p = Price.builder()
+                    .currencyType(CurrencyType.fromString(priceEntry.getKey()))
+                    .price(priceEntry.getValue())
+                    .build();
+            priceList.add(p);
+        }
+
+        List<Image> imageList = new ArrayList<>();
+        Image image = Image.builder()
+                .imageName(apTr.getImage1())
+                .build();
+        imageList.add(image);
+        image = Image.builder()
+                .imageName(apTr.getImage2())
+                .build();
+        imageList.add(image);
+
+        AdvertisementPage ap = AdvertisementPage.builder()
+                .pageTitle(apTr.getPageTitle())
+                .estate(estate)
+                .priceList(priceList)
+                .pageId(apTr.getPageId())
+                .editDate(apTr.getLastUpdated())
+                .pageSource(PageSource.fromString(apTr.getPageSource()))
+                .imageList(imageList)
+                .build();
 
         return ap;
     }

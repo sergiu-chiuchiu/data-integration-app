@@ -29,7 +29,7 @@ public class AdvertisementPage {
     @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     List<Price> priceList;
     String pageId;
-    String publishDate;
+//    String publishDate;
     @Temporal(TemporalType.DATE)
     Calendar editDate;
     @Enumerated(EnumType.STRING)

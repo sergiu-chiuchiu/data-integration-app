@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Component
 public class AdvertisementPageTTransformer extends AdvertisementPageTransformer {
@@ -13,11 +14,4 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
     private String state;
     private String propertyType;
 
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setPropertyType(String propertyType) {
-        this.propertyType = propertyType;
-    }
 }

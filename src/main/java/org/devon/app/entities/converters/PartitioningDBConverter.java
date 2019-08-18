@@ -1,6 +1,5 @@
 package org.devon.app.entities.converters;
 
-import org.devon.app.entities.enums.ComfortType;
 import org.devon.app.entities.enums.Partitioning;
 
 import javax.persistence.AttributeConverter;
@@ -8,23 +7,22 @@ import javax.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class ComfortTypeConverter implements AttributeConverter<ComfortType, String> {
-
+public class PartitioningDBConverter implements AttributeConverter<Partitioning, String> {
 
     @Override
-    public String convertToDatabaseColumn(ComfortType attribute) {
+    public String convertToDatabaseColumn(Partitioning attribute) {
         if (attribute == null) return null;
-
-        return attribute.getComfortType();
+        return attribute.name().toLowerCase();
     }
 
     @Override
-    public ComfortType convertToEntityAttribute(String dbData) {
+    public Partitioning convertToEntityAttribute(String dbData) {
         if (dbData == null) return null;
-
-        return Stream.of(ComfortType.values())
-                .filter(comfortType -> comfortType.getComfortType().equals(dbData))
+        return Stream.of(Partitioning.values())
+                .filter(c -> c.name().equals(dbData.toUpperCase()))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
+
+
 }

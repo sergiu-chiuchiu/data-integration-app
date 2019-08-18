@@ -21,7 +21,7 @@ public class Construction {
     String constructionState;
     String resistanceStructure;
     String buildingType;
-    String FloorsBreakdown;
+    Integer floor;
     Integer totalNoOfFloors;
 
     @OneToOne(mappedBy = "construction")

@@ -46,14 +46,21 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToPriceList(String prices) {
         try {
-            List<String> priceList = new ArrayList<>();
+            Map<String, Double> priceList = new HashMap<>();
             String price;
-            prices = prices.replace((price = prices.substring(0, prices.indexOf("RON") + 3)), "");
-            priceList.add(price);
-            prices = prices.replace((price = prices.substring(0, prices.indexOf("USD") + 3)), "");
-            priceList.add(price);
-            prices.replace((price = prices.substring(0, prices.indexOf("EUR") + 3)), "");
-            priceList.add(price);
+
+            price = prices.substring(0, prices.indexOf("RON") + 3);
+            prices = prices.replace(price, "");
+            priceList.put("RON", Double.parseDouble(price));
+
+            price = prices.substring(0, prices.indexOf("USD") + 3);
+            prices = prices.replace(price, "");
+            priceList.put("USD", Double.parseDouble(price));
+
+            price = prices.substring(0, prices.indexOf("EUR") + 3);
+            prices = prices.replace(price, "");
+            priceList.put("EUR", Double.parseDouble(price));
+
             super.setPriceList(priceList);
         } catch (Exception ex) {
             ex.printStackTrace();

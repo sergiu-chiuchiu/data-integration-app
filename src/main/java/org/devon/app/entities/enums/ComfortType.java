@@ -12,4 +12,13 @@ public enum ComfortType {
     public String getComfortType() {
         return comfortType;
     }
+
+    public static ComfortType fromString(String comfTypeStr) {
+        for (ComfortType ct : ComfortType.values()) {
+            if (ct.comfortType.equalsIgnoreCase(comfTypeStr)) {
+                return ct;
+            }
+        }
+        return null;
+    }
 }

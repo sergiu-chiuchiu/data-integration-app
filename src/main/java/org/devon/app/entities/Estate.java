@@ -20,7 +20,6 @@ public class Estate {
     Long id;
 
     Partitioning partitioning;
-    Integer floor;
     ComfortType comfortType;
     String estateState;
     String propertyType;

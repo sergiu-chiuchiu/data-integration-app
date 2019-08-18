@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public abstract class AdvertisementPageTransformer {
     private String pageTitle;
     private String city;
     private String neighbourhood;
-    private List<String> priceList;
+    private Map<String, Double> priceList;
     private Integer noOfRooms;
     private Double usefulArea;
     private Double builtSurface;
