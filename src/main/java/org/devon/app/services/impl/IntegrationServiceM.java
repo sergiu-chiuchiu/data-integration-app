@@ -91,7 +91,7 @@ public class IntegrationServiceM implements IintegrationService {
     public <E, F extends AdvertisementPageTransformer> E checkForDuplicatesBetween(F mTransformer) {
 
 
-        //TOOD
+        //TODO
         return null;
     }
 
@@ -108,11 +108,11 @@ public class IntegrationServiceM implements IintegrationService {
     }
 
     @Override
-    public <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E mTransfomer) {
-        AdvertisementPage ap = advertisementPageRepository.findByPageId(mTransfomer.getPageId());
+    public <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E mTransformer) {
+        AdvertisementPage ap = advertisementPageRepository.findByPageId(mTransformer.getPageId());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        Boolean isDateEqual = sdf.format(ap.getEditDate().getTime()).equals(sdf.format(mTransfomer.getLastUpdated().getTime()));
+        Boolean isDateEqual = sdf.format(ap.getEditDate().getTime()).equals(sdf.format(mTransformer.getLastUpdated().getTime()));
         if(isDateEqual) {
             return false;
         }
@@ -280,7 +280,7 @@ public class IntegrationServiceM implements IintegrationService {
                     break;
                 case "Image2":
 //                    System.out.println("good " + item);
-                    mTransformer.setImage2(item);
+                    mTransformer.setImage2(item.trim());
                     break;
                 default:
                     LOG.error("The header " + header + " could not be matched with a case");

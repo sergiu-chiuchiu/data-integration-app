@@ -24,7 +24,6 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
     private String comfort;
     private Integer noOfKitchens;
     private String resistanceStructure;
-    private String buildingType;
     private String floorsBreakdown;
     private Integer noOfBalconies;
 

@@ -15,7 +15,7 @@ import java.util.*;
 @Component
 public class AdvertisementPageTTransformer extends AdvertisementPageTransformer {
 
-    private String EstateState;
+    private String estateState;
     private String propertyType;
 
     @Override
@@ -72,8 +72,115 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
             super.setBuiltSurface(builtSurface);
         } catch (ParseException pe) {
             pe.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setPartitioning(String partitioning) {
+        super.setPartitioning(partitioning.trim());
+    }
+
+    public void convertFloorItem(String floorStr) {
+        try {
+            Integer floor;
+            if (floorStr.equalsIgnoreCase("Parter")) {
+                floor = 0;
+            } else {
+                floor = Integer.valueOf(floorStr);
+            }
+            super.setFloorNo(floor);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void convertToNoOfBathrooms(String noOfBathStr) {
+        try {
+            Integer noOfBahtrooms = Integer.valueOf(noOfBathStr);
+            super.setNoOfBathrooms(noOfBahtrooms);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void convertToConstructionYear(String consYearStr) {
+        try {
+            Integer constructionYear = Integer.valueOf(consYearStr);
+            super.setConstructionYear(constructionYear);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void convertToBuildingType(String bldType) {
+        if (bldType.equalsIgnoreCase("apartament")) {
+            bldType = "bloc de apartamente";
+        } else {
+            bldType = bldType.trim();
+        }
+        super.setBuildingType(bldType);
+    }
+
+
+    public void convertToTotalFloors(String totalFloorsStr) {
+        try {
+            Integer totalFloors = Integer.valueOf(totalFloorsStr);
+            super.setTotalFloors(totalFloors);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setPageId(String pageId) {
+        super.setPageId(pageId.trim());
+    }
+
+    public void convertToLastUpdated(String lastUpdatedStr) {
+        try {
+            String updatepoint = "Data modificarii:";
+            int length = updatepoint.length();
+            int startIdx = lastUpdatedStr.indexOf(updatepoint);
+            lastUpdatedStr = lastUpdatedStr
+                    .substring(startIdx + length);
+            lastUpdatedStr = lastUpdatedStr
+                    .substring(0, lastUpdatedStr.indexOf("în urmă"))
+                    .trim();
+
+            Calendar lastUpdated = Calendar.getInstance();
+            Integer lastUpdatedInt;
+            if (lastUpdatedStr.contains("ore")) {
+                lastUpdatedInt = Integer.valueOf(lastUpdatedStr
+                        .replace("ore", "")
+                        .trim()
+                );
+                lastUpdated.add(Calendar.HOUR, -lastUpdatedInt);
+            } else if (lastUpdatedStr.contains("o zi")) {
+                lastUpdated.add(Calendar.DATE, -1);
+            } else if (lastUpdatedStr.contains("zile")) {
+                lastUpdatedInt = Integer.valueOf(lastUpdatedStr
+                        .replace("zile", "")
+                        .trim()
+                );
+                lastUpdated.add(Calendar.DATE, -lastUpdatedInt);
+            }
+            super.setLastUpdated(lastUpdated);
+        } catch (StringIndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setImage1(String image1) {
+        super.setImage1(image1.trim());
+    }
+
+    @Override
+    public void setImage2(String image2) {
+        super.setImage2(image2.trim());
+    }
+
+    public void setEstateState(String estateState) {
+        this.estateState = estateState.trim();
     }
 }

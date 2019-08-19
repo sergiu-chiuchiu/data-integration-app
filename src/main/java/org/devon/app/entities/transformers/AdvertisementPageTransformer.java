@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -25,6 +24,7 @@ public abstract class AdvertisementPageTransformer {
     private Integer totalFloors;
     private Integer noOfBathrooms;
     private Integer constructionYear;
+    private String buildingType;
     private String pageId;
     private Calendar lastUpdated;
     private String pageSource;
