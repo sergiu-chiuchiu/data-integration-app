@@ -10,6 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Builder
+@ToString
 public class Construction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +23,5 @@ public class Construction {
     String buildingType;
     Integer floor;
     Integer totalNoOfFloors;
-
-    @OneToOne(mappedBy = "construction")
-    Estate estate;
 
 }

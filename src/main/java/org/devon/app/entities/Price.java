@@ -11,8 +11,10 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Builder
+@ToString
 public class Price {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     Double price;
@@ -20,6 +22,7 @@ public class Price {
     CurrencyType currencyType;
 
     @ManyToOne
+    @ToString.Exclude
     AdvertisementPage advertisementPage;
 
 

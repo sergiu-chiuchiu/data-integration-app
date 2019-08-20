@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Builder
-
+@ToString
 public class Estate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +34,5 @@ public class Estate {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Rooms rooms;
-
-    @OneToOne(mappedBy ="estate")
-    AdvertisementPage advertisementPage;
 
 }

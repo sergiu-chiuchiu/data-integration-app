@@ -46,8 +46,9 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
     public void convertToPriceList(String prices) {
         try {
             Map<String, Double> priceList = new HashMap<>();
-            String price;
+            prices = prices.replace(".", "");
 
+            String price;
             price = prices.substring(0, prices.indexOf("RON") + 3);
             prices = prices.replace(price, "");
             price = price.replace(" RON", "").trim();

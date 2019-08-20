@@ -9,9 +9,8 @@ import java.util.List;
 
 @Repository
 public interface AdvertisementPageRepository extends JpaRepository<AdvertisementPage, Long> {
+
     public List<AdvertisementPage> findByPageSource(PageSource pageSource);
 
     public AdvertisementPage findByPageId(String pageId);
-
-
 }

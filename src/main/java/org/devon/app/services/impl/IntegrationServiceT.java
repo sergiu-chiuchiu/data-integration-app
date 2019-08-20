@@ -5,7 +5,6 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import org.devon.app.entities.*;
-import org.devon.app.entities.enums.ComfortType;
 import org.devon.app.entities.enums.CurrencyType;
 import org.devon.app.entities.enums.PageSource;
 import org.devon.app.entities.enums.Partitioning;
@@ -14,6 +13,7 @@ import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,8 @@ public class IntegrationServiceT  implements IintegrationService {
 
     @Autowired
     AdvertisementPageRepository advertisementPageRepository;
+    @Autowired
+    ModelMapper modelMapper;
 
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
@@ -62,7 +64,9 @@ public class IntegrationServiceT  implements IintegrationService {
                 if (isDuplicateWithin) {
                     Boolean isModifiedRecord = checkForRecordUpdate(tTransformer);
                     if (isModifiedRecord) {
-                        AdvertisementPage ap = mapTransformerToEntities(tTransformer);
+                        AdvertisementPage updatedAp = mapTransformerToEntities(tTransformer);
+                        AdvertisementPage ap = advertisementPageRepository.findByPageId(updatedAp.getPageId());
+                        modelMapper.map(updatedAp, ap);
                         advertisementPageRepository.save(ap);
                     }
                 } else {
@@ -170,7 +174,7 @@ public class IntegrationServiceT  implements IintegrationService {
     }
 
     @Override
-    public <E, F extends AdvertisementPageTransformer> E checkForDuplicatesBetween(F tTransformer) {
+    public  checkForDuplicatesBetween(AdvertisementPage apToCheck) {
         //TODO
         return null;
     }

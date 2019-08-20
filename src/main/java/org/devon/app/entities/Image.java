@@ -10,13 +10,16 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Builder
+@ToString
 public class Image {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String imageName;
 
     @ManyToOne
+    @ToString.Exclude
     AdvertisementPage advertisementPage;
 
 }

@@ -15,6 +15,7 @@ import javax.persistence.Id;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Builder
+@ToString
 public class Area {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

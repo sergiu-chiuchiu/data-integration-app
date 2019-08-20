@@ -4,17 +4,19 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import org.devon.app.Comparator.AdvertisementPageComparator;
+import org.devon.app.ConsoleInteractions;
 import org.devon.app.entities.*;
 import org.devon.app.entities.enums.ComfortType;
 import org.devon.app.entities.enums.CurrencyType;
 import org.devon.app.entities.enums.PageSource;
 import org.devon.app.entities.enums.Partitioning;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
-import org.devon.app.entities.transformers.AdvertisementPageTTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,12 @@ public class IntegrationServiceM implements IintegrationService {
 
     @Autowired
     AdvertisementPageRepository advertisementPageRepository;
+    @Autowired
+    ModelMapper modelMapper;
+    @Autowired
+    AdvertisementPageComparator advertisementPageComparator;
+    @Autowired
+    ConsoleInteractions consoleInteractions;
 
     @Override
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
@@ -64,20 +72,16 @@ public class IntegrationServiceM implements IintegrationService {
                 if (isDuplicateWithin) {
                     Boolean isModifiedRecord = checkForRecordUpdate(mTransformer);
                     if (isModifiedRecord) {
-                        AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                        AdvertisementPage updatedAp = mapTransformerToEntities(mTransformer);
+                        AdvertisementPage ap = advertisementPageRepository.findByPageId(updatedAp.getPageId());
+                        modelMapper.map(updatedAp, ap);
                         advertisementPageRepository.save(ap);
                     }
                 } else {
-                    AdvertisementPageTTransformer duplicateAP = checkForDuplicatesBetween(mTransformer);
-                    if (duplicateAP == null) {
-                        AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                    AdvertisementPage ap = mapTransformerToEntities(mTransformer);
+                    Boolean shouldSave = checkForDuplicatesBetween(ap);
+                    if (shouldSave) {
                         advertisementPageRepository.save(ap);
-                    } else {
-//                        Boolean isModifiedRecord = checkForRecordBetweenUpdate(mTransformer, duplicateAP);
-//                        if (isModifiedRecord) {
-//                            AdvertisementPage ap = mapTransformerToEntities(mTransformer);
-//                            advertisementPageRepository.save(ap);
-//                        }
                     }
                 }
             }
@@ -88,11 +92,19 @@ public class IntegrationServiceM implements IintegrationService {
     }
 
     @Override
-    public <E, F extends AdvertisementPageTransformer> E checkForDuplicatesBetween(F mTransformer) {
+    public Boolean checkForDuplicatesBetween(AdvertisementPage apToCheck) {
+        List<AdvertisementPage> apList = advertisementPageRepository.findAll();
 
-
-        //TODO
-        return null;
+        for (AdvertisementPage existingAp : apList) {
+            Boolean duplTresholdExceeded = advertisementPageComparator.comparePages(existingAp, apToCheck);
+            if (duplTresholdExceeded) {
+                LOG.info(">>>>>>>>>> For new record with pageID " + apToCheck.getPageId() + " there have been found a potential duplicate in record with page ID " + existingAp.getPageId() + " <<<<<<<<<<<<<<");
+                LOG.info("New record: " + apToCheck.toString());
+                LOG.info("Existing record: " + existingAp.toString());
+                return consoleInteractions.askForDuplicatePersistence();
+            }
+        }
+        return true;
     }
 
     @Override

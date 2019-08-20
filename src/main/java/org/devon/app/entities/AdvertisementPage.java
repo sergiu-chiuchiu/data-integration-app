@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
+@ToString
 public class AdvertisementPage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
