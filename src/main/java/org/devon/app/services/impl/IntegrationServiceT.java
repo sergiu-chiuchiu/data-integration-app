@@ -4,6 +4,8 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import org.devon.app.Comparator.AdvertisementPageComparator;
+import org.devon.app.ConsoleInteractions;
 import org.devon.app.entities.*;
 import org.devon.app.entities.enums.CurrencyType;
 import org.devon.app.entities.enums.PageSource;
@@ -13,6 +15,7 @@ import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
+import org.devon.app.utils.Constants;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +25,10 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
-public class IntegrationServiceT  implements IintegrationService {
+public class IntegrationServiceT implements IintegrationService {
     private static Logger LOG = LoggerFactory
             .getLogger(IntegrationServiceM.class);
 
@@ -36,6 +36,10 @@ public class IntegrationServiceT  implements IintegrationService {
     AdvertisementPageRepository advertisementPageRepository;
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    private ConsoleInteractions consoleInteractions;
+    @Autowired
+    private AdvertisementPageComparator advertisementPageComparator;
 
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
@@ -70,16 +74,10 @@ public class IntegrationServiceT  implements IintegrationService {
                         advertisementPageRepository.save(ap);
                     }
                 } else {
-                    AdvertisementPageTTransformer duplicateAP = checkForDuplicatesBetween(tTransformer);
-                    if (duplicateAP == null) {
-                        AdvertisementPage ap = mapTransformerToEntities(tTransformer);
+                    AdvertisementPage ap = mapTransformerToEntities(tTransformer);
+                    Boolean shouldSave = checkForDuplicatesBetween(ap);
+                    if (shouldSave) {
                         advertisementPageRepository.save(ap);
-                    } else {
-//                        Boolean isModifiedRecord = checkForRecordBetweenUpdate(tTransformer, duplicateAP);
-//                        if (isModifiedRecord) {
-//                            AdvertisementPage ap = mapTransformerToEntities(tTransformer);
-//                            advertisementPageRepository.save(ap);
-//                        }
                     }
                 }
             }
@@ -174,9 +172,23 @@ public class IntegrationServiceT  implements IintegrationService {
     }
 
     @Override
-    public  checkForDuplicatesBetween(AdvertisementPage apToCheck) {
-        //TODO
-        return null;
+    public Boolean checkForDuplicatesBetween(AdvertisementPage apToCheck) {
+        List<AdvertisementPage> apList = advertisementPageRepository.findAll();
+
+        for (AdvertisementPage existingAp : apList) {
+            Double duplScore = advertisementPageComparator.comparePages(existingAp, apToCheck);
+            Boolean result = duplScore >= Constants.DUPLICATE_TRESHOLD;
+            if (result) {
+                System.out.println(">>>>>>>>>> For new record with pageID " + apToCheck.getPageId()
+                        + " there have been found a potential duplicate in record with page ID "
+                        + existingAp.getPageId() + " with a duplicate percentage of: " + duplScore * 100 + "% <<<<<<<<<<<<<<");
+                System.out.println("New record: " + apToCheck.toString());
+                System.out.println("Existing record: " + existingAp.toString());
+                Boolean shouldSaveUserDecision = consoleInteractions.askForDuplicatePersistence();
+                return shouldSaveUserDecision;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -197,7 +209,7 @@ public class IntegrationServiceT  implements IintegrationService {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         Boolean isDateEqual = sdf.format(ap.getEditDate().getTime()).equals(sdf.format(tTransformer.getLastUpdated().getTime()));
-        if(isDateEqual) {
+        if (isDateEqual) {
             return false;
         }
         return true;
@@ -242,7 +254,7 @@ public class IntegrationServiceT  implements IintegrationService {
                 .pageSource(PageSource.fromString(apTr.getPageSource()))
                 .build();
 
-        List<Price> priceList = new ArrayList<>();
+        Set<Price> priceList = new HashSet<>();
         for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
             Price p = Price.builder()
                     .currencyType(CurrencyType.fromString(priceEntry.getKey()))
@@ -252,7 +264,7 @@ public class IntegrationServiceT  implements IintegrationService {
             priceList.add(p);
         }
 
-        List<Image> imageList = new ArrayList<>();
+        Set<Image> imageList = new HashSet<>();
         Image image = Image.builder()
                 .imageName(apTr.getImage1())
                 .advertisementPage(ap)
@@ -264,7 +276,7 @@ public class IntegrationServiceT  implements IintegrationService {
                 .build();
         imageList.add(image);
 
-        ap.setImageList(imageList);
+        ap.setImages(imageList);
         ap.setPriceList(priceList);
 
         return ap;

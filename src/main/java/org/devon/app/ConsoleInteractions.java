@@ -2,6 +2,7 @@ package org.devon.app;
 
 import org.springframework.stereotype.Component;
 
+import java.awt.image.BandedSampleModel;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,16 +15,16 @@ public class ConsoleInteractions {
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(System.in));
         // Reading data using readLine
+        Boolean answer = false;
         try {
-            Boolean needAnswer = true;
-            while (needAnswer) {
+            while (true) {
                 String name = reader.readLine();
                 if (name.trim().equalsIgnoreCase("y")) {
-                    needAnswer = false;
-                    return true;
+                    answer = true;
+                    break;
                 } else if (name.trim().equalsIgnoreCase("n")) {
-
-                    return needAnswer = false;
+                    answer = false;
+                    break;
                 } else {
                     // request again the answer
                     System.out.println("Answer not understood. Would you still like to persist the new record? y/n");
@@ -31,6 +32,8 @@ public class ConsoleInteractions {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            return answer;
         }
     }
 

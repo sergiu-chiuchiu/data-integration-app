@@ -16,6 +16,7 @@ import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
+import org.devon.app.utils.Constants;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class IntegrationServiceM implements IintegrationService {
@@ -96,12 +94,14 @@ public class IntegrationServiceM implements IintegrationService {
         List<AdvertisementPage> apList = advertisementPageRepository.findAll();
 
         for (AdvertisementPage existingAp : apList) {
-            Boolean duplTresholdExceeded = advertisementPageComparator.comparePages(existingAp, apToCheck);
-            if (duplTresholdExceeded) {
+            Double duplScore = advertisementPageComparator.comparePages(existingAp, apToCheck);
+            Boolean result = duplScore >= Constants.DUPLICATE_TRESHOLD;
+            if (result) {
                 LOG.info(">>>>>>>>>> For new record with pageID " + apToCheck.getPageId() + " there have been found a potential duplicate in record with page ID " + existingAp.getPageId() + " <<<<<<<<<<<<<<");
                 LOG.info("New record: " + apToCheck.toString());
                 LOG.info("Existing record: " + existingAp.toString());
-                return consoleInteractions.askForDuplicatePersistence();
+                Boolean shouldSaveUserDecision = consoleInteractions.askForDuplicatePersistence();
+                return shouldSaveUserDecision;
             }
         }
         return true;
@@ -175,7 +175,7 @@ public class IntegrationServiceM implements IintegrationService {
                 .build();
 
 
-        List<Price> priceList = new ArrayList<>();
+        Set<Price> priceList = new HashSet<>();
         for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
             Price p = Price.builder()
                     .currencyType(CurrencyType.fromString(priceEntry.getKey()))
@@ -185,7 +185,7 @@ public class IntegrationServiceM implements IintegrationService {
             priceList.add(p);
         }
 
-        List<Image> imageList = new ArrayList<>();
+        Set<Image> imageList = new HashSet<>();
         Image image = Image.builder()
                 .imageName(apTr.getImage1())
                 .advertisementPage(ap)
@@ -197,7 +197,7 @@ public class IntegrationServiceM implements IintegrationService {
                 .build();
         imageList.add(image);
 
-        ap.setImageList(imageList);
+        ap.setImages(imageList);
         ap.setPriceList(priceList);
 
         return ap;

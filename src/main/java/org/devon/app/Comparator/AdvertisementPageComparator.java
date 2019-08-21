@@ -3,12 +3,11 @@ package org.devon.app.Comparator;
 import org.devon.app.entities.AdvertisementPage;
 import org.devon.app.entities.Price;
 import org.devon.app.entities.enums.Partitioning;
-import org.devon.app.utils.Constants;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class AdvertisementPageComparator {
@@ -18,7 +17,7 @@ public class AdvertisementPageComparator {
     private String[] lowScore = {"isRegionDuplicate", "isPartitioningDuplicate", "isNoOfRoomsDuplicate", "isNoOfBathroomsDuplicate", "isFloorDuplicate", "isTotalFloorsDuplicate"};
 
 
-    public Boolean comparePages(AdvertisementPage existingPage, AdvertisementPage newPage) {
+    public Double comparePages(AdvertisementPage existingPage, AdvertisementPage newPage) {
 
         Map<String, Boolean> duplicateFields = new HashMap<>();
 
@@ -37,9 +36,7 @@ public class AdvertisementPageComparator {
 
         Double duplicateScore = calculateDuplicateScore(duplicateFields);
 
-        Boolean result = duplicateScore >= Constants.DUPLICATE_TRESHOLD;
-
-        return result;
+        return duplicateScore;
     }
 
     private Double calculateDuplicateScore(Map<String, Boolean> duplicateFields) {
@@ -64,34 +61,44 @@ public class AdvertisementPageComparator {
     }
 
     private Boolean checkPageTitleDuplicate(String existingVal, String newVal) {
-        if (existingVal.equalsIgnoreCase(newVal)) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal.equalsIgnoreCase(newVal)) {
             return true;
         }
         return false;
     }
 
     private Boolean checkDoubleDuplicate(Double existingVal, Double newVal) {
-        if (existingVal.equals(newVal)) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal.equals(newVal)) {
             return true;
         }
         return false;
     }
 
     private Boolean isRegionDuplicate(String existingVal, String newVal) {
-        if (existingVal.equalsIgnoreCase(newVal)) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal.equalsIgnoreCase(newVal)) {
             return true;
         }
         return false;
     }
 
     private Boolean isNeighbourhoodDuplicate(String existingVal, String newVal) {
-        if (existingVal.equalsIgnoreCase(newVal)) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal.equalsIgnoreCase(newVal)) {
             return true;
         }
         return false;
     }
 
-    private Boolean isPriceDuplicate(List<Price> existingVal, List<Price> newVal) {
+    private Boolean isPriceDuplicate(Set<Price> existingVal, Set<Price> newVal) {
         Boolean isPriceDupl = false;
         outerLoop:
         for (Price existingPrice : existingVal) {
@@ -108,7 +115,9 @@ public class AdvertisementPageComparator {
     }
 
     private Boolean isPartitioningDuplicate(Partitioning existingVal, Partitioning newVal) {
-        if (existingVal == newVal) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal == newVal) {
             return true;
         }
         return false;
@@ -116,7 +125,9 @@ public class AdvertisementPageComparator {
 
 
     private Boolean checkIntegerDuplicate(Integer existingVal, Integer newVal) {
-        if (existingVal.equals(newVal)) {
+        if (existingVal == null || newVal == null) {
+            return false;
+        } else if (existingVal.equals(newVal)) {
             return true;
         }
         return false;

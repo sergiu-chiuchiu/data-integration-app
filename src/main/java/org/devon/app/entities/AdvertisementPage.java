@@ -4,9 +4,8 @@ import lombok.*;
 import org.devon.app.entities.enums.PageSource;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -25,8 +24,8 @@ public class AdvertisementPage {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Estate estate;
 
-    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<Price> priceList;
+    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    Set<Price> priceList;
 
     String pageId;
 //    String publishDate;
@@ -35,8 +34,8 @@ public class AdvertisementPage {
     @Enumerated(EnumType.STRING)
     PageSource pageSource;
 
-    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<Image> imageList;
+    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    Set<Image> images;
 
 }
 
