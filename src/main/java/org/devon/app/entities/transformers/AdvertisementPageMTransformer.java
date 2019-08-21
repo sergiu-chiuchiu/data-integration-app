@@ -1,10 +1,15 @@
 package org.devon.app.entities.transformers;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.devon.app.entities.*;
+import org.devon.app.entities.enums.ComfortType;
+import org.devon.app.entities.enums.CurrencyType;
+import org.devon.app.entities.enums.PageSource;
+import org.devon.app.entities.enums.Partitioning;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.NumberFormat;
@@ -14,7 +19,6 @@ import java.util.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Component
 public class AdvertisementPageMTransformer extends AdvertisementPageTransformer {
     private static Logger LOG = LoggerFactory
@@ -26,6 +30,82 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
     private String resistanceStructure;
     private String floorsBreakdown;
     private Integer noOfBalconies;
+
+    public AdvertisementPageMTransformer() {
+        setPageSource("M");
+    }
+
+    @Override
+    public AdvertisementPage mapTransformerToEntity() {
+        AdvertisementPageMTransformer apTr = this;
+
+        Area area = Area.builder()
+                .usefulArea(apTr.getUsefulArea())
+                .builtSurface(apTr.getBuiltSurface())
+                .totalUsefulArea(apTr.getTotalUsefulArea())
+                .build();
+
+        Construction construction = Construction.builder()
+                .constructionYear(apTr.getConstructionYear())
+                .resistanceStructure(apTr.getResistanceStructure())
+                .buildingType(apTr.getBuildingType())
+                .floor(apTr.getFloorNo())
+                .totalNoOfFloors(apTr.getTotalFloors())
+                .build();
+
+        Rooms rooms = Rooms.builder()
+                .noOfRooms(apTr.getNoOfRooms())
+                .noOfKitchens(apTr.getNoOfKitchens())
+                .noOfBalconies(apTr.getNoOfBalconies())
+                .noOfBathrooms(apTr.getNoOfBathrooms())
+                .build();
+
+        Estate estate = Estate.builder()
+                .partitioning(Partitioning.fromString(apTr.getPartitioning()))
+                .comfortType(ComfortType.fromString(apTr.getComfort()))
+                .region(apTr.getRegion())
+                .neighbourhood(apTr.getNeighbourhood())
+                .area(area)
+                .construction(construction)
+                .rooms(rooms)
+                .build();
+
+        AdvertisementPage ap = AdvertisementPage.builder()
+                .pageTitle(apTr.getPageTitle())
+                .estate(estate)
+                .pageId(apTr.getPageId())
+                .editDate(apTr.getLastUpdated())
+                .pageSource(PageSource.fromString(apTr.getPageSource()))
+                .build();
+
+
+        Set<Price> priceList = new HashSet<>();
+        for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
+            Price p = Price.builder()
+                    .currencyType(CurrencyType.fromString(priceEntry.getKey()))
+                    .price(priceEntry.getValue())
+                    .advertisementPage(ap)
+                    .build();
+            priceList.add(p);
+        }
+
+        Set<Image> imageList = new HashSet<>();
+        Image image = Image.builder()
+                .imageName(apTr.getImage1())
+                .advertisementPage(ap)
+                .build();
+        imageList.add(image);
+        image = Image.builder()
+                .imageName(apTr.getImage2())
+                .advertisementPage(ap)
+                .build();
+        imageList.add(image);
+
+        ap.setImages(imageList);
+        ap.setPriceList(priceList);
+
+        return ap;
+    }
 
     public void convertZone(String zone) {
         try {

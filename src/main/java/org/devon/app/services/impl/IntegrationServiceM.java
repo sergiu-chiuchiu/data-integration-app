@@ -1,10 +1,7 @@
 package org.devon.app.services.impl;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import org.devon.app.Comparator.AdvertisementPageComparator;
+import org.devon.app.comparator.AdvertisementPageComparator;
 import org.devon.app.ConsoleInteractions;
 import org.devon.app.entities.*;
 import org.devon.app.entities.enums.ComfortType;
@@ -15,7 +12,6 @@ import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
-import org.devon.app.services.IintegrationService;
 import org.devon.app.utils.Constants;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -29,178 +25,39 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class IntegrationServiceM implements IintegrationService {
+public class IntegrationServiceM extends AIntegrationService {
     private static Logger LOG = LoggerFactory
             .getLogger(IntegrationServiceM.class);
 
     @Autowired
-    AdvertisementPageRepository advertisementPageRepository;
-    @Autowired
-    ModelMapper modelMapper;
-    @Autowired
-    AdvertisementPageComparator advertisementPageComparator;
-    @Autowired
-    ConsoleInteractions consoleInteractions;
+    public IntegrationServiceM(AdvertisementPageRepository advertisementPageRepository, ModelMapper modelMapper, AdvertisementPageComparator advertisementPageComparator, ConsoleInteractions consoleInteractions) {
+        this.advertisementPageRepository = advertisementPageRepository;
+        this.modelMapper = modelMapper;
+        this.advertisementPageComparator = advertisementPageComparator;
+        this.consoleInteractions = consoleInteractions;
+    }
 
     @Override
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
-            CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
-            CSVReader csvReader = new CSVReaderBuilder(br).withCSVParser(parser).build();
-
-            List<String> header = Arrays.asList(csvReader.readNext());
-            header.set(0, header.get(0).substring(1));
+            CSVReader csvReader = csvReaderInit(br);
+            List<String> header = getDataHeader(csvReader);
 
             String[] nextRecord;
             int cnt = 0;
-            // we are going to read data line by line
             while ((nextRecord = csvReader.readNext()) != null) {
-                System.out.println("<-- " + String.valueOf(cnt++) + " -->");
-
+                System.out.println("<-- " + ++cnt + " -->");
                 AdvertisementPageMTransformer mTransformer = new AdvertisementPageMTransformer();
-                mTransformer.setPageSource("M");
-                int c = 0;
-                for (String cell : nextRecord) {
+                for (int c = 0; c < nextRecord.length; c++) {
                     mapItemToTransformer(header.get(c), nextRecord[c], mTransformer);
-                    c++;
-//                    System.out.print(cell + " == " + String.valueOf(c) + " == \t");
                 }
 
-                Boolean isDuplicateWithin = checkForDuplicatesWithin(mTransformer);
-                if (isDuplicateWithin) {
-                    Boolean isModifiedRecord = checkForRecordUpdate(mTransformer);
-                    if (isModifiedRecord) {
-                        AdvertisementPage updatedAp = mapTransformerToEntities(mTransformer);
-                        AdvertisementPage ap = advertisementPageRepository.findByPageId(updatedAp.getPageId());
-                        modelMapper.map(updatedAp, ap);
-                        advertisementPageRepository.save(ap);
-                    }
-                } else {
-                    AdvertisementPage ap = mapTransformerToEntities(mTransformer);
-                    Boolean shouldSave = checkForDuplicatesBetween(ap);
-                    if (shouldSave) {
-                        advertisementPageRepository.save(ap);
-                    }
-                }
+                validateTransformerAndPersist(mTransformer);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public Boolean checkForDuplicatesBetween(AdvertisementPage apToCheck) {
-        List<AdvertisementPage> apList = advertisementPageRepository.findAll();
-
-        for (AdvertisementPage existingAp : apList) {
-            Double duplScore = advertisementPageComparator.comparePages(existingAp, apToCheck);
-            Boolean result = duplScore >= Constants.DUPLICATE_TRESHOLD;
-            if (result) {
-                LOG.info(">>>>>>>>>> For new record with pageID " + apToCheck.getPageId() + " there have been found a potential duplicate in record with page ID " + existingAp.getPageId() + " <<<<<<<<<<<<<<");
-                LOG.info("New record: " + apToCheck.toString());
-                LOG.info("Existing record: " + existingAp.toString());
-                Boolean shouldSaveUserDecision = consoleInteractions.askForDuplicatePersistence();
-                return shouldSaveUserDecision;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public <E extends AdvertisementPageTransformer> Boolean checkForDuplicatesWithin(E mTransformer) {
-        List<AdvertisementPage> advertisementPageList = advertisementPageRepository.findByPageSource(PageSource.fromString(mTransformer.getPageSource()));
-
-        for (AdvertisementPage ap : advertisementPageList) {
-            if (mTransformer.getPageId().equals(ap.getPageId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E mTransformer) {
-        AdvertisementPage ap = advertisementPageRepository.findByPageId(mTransformer.getPageId());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        Boolean isDateEqual = sdf.format(ap.getEditDate().getTime()).equals(sdf.format(mTransformer.getLastUpdated().getTime()));
-        if(isDateEqual) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public <E extends AdvertisementPageTransformer> AdvertisementPage mapTransformerToEntities(E advertisementPageTransformer) {
-        AdvertisementPageMTransformer apTr = (AdvertisementPageMTransformer) advertisementPageTransformer;
-
-        Area area = Area.builder()
-                .usefulArea(apTr.getUsefulArea())
-                .builtSurface(apTr.getBuiltSurface())
-                .totalUsefulArea(apTr.getTotalUsefulArea())
-                .build();
-
-        Construction construction = Construction.builder()
-                .constructionYear(apTr.getConstructionYear())
-                .resistanceStructure(apTr.getResistanceStructure())
-                .buildingType(apTr.getBuildingType())
-                .floor(apTr.getFloorNo())
-                .totalNoOfFloors(apTr.getTotalFloors())
-                .build();
-
-        Rooms rooms = Rooms.builder()
-                .noOfRooms(apTr.getNoOfRooms())
-                .noOfKitchens(apTr.getNoOfKitchens())
-                .noOfBalconies(apTr.getNoOfBalconies())
-                .noOfBathrooms(apTr.getNoOfBathrooms())
-                .build();
-
-        Estate estate = Estate.builder()
-                .partitioning(Partitioning.fromString(apTr.getPartitioning()))
-                .comfortType(ComfortType.fromString(apTr.getComfort()))
-                .region(apTr.getRegion())
-                .neighbourhood(apTr.getNeighbourhood())
-                .area(area)
-                .construction(construction)
-                .rooms(rooms)
-                .build();
-
-        AdvertisementPage ap = AdvertisementPage.builder()
-                .pageTitle(apTr.getPageTitle())
-                .estate(estate)
-                .pageId(apTr.getPageId())
-                .editDate(apTr.getLastUpdated())
-                .pageSource(PageSource.fromString(apTr.getPageSource()))
-                .build();
-
-
-        Set<Price> priceList = new HashSet<>();
-        for (Map.Entry<String, Double> priceEntry : apTr.getPriceList().entrySet()) {
-            Price p = Price.builder()
-                    .currencyType(CurrencyType.fromString(priceEntry.getKey()))
-                    .price(priceEntry.getValue())
-                    .advertisementPage(ap)
-                    .build();
-            priceList.add(p);
-        }
-
-        Set<Image> imageList = new HashSet<>();
-        Image image = Image.builder()
-                .imageName(apTr.getImage1())
-                .advertisementPage(ap)
-                .build();
-        imageList.add(image);
-        image = Image.builder()
-                .imageName(apTr.getImage2())
-                .advertisementPage(ap)
-                .build();
-        imageList.add(image);
-
-        ap.setImages(imageList);
-        ap.setPriceList(priceList);
-
-        return ap;
     }
 
     private void mapItemToTransformer(String header, String item, AdvertisementPageMTransformer mTransformer) {
@@ -211,87 +68,66 @@ public class IntegrationServiceM implements IintegrationService {
 
             switch (header) {
                 case "PageTitle":
-//                    System.out.println("good " + item);
                     mTransformer.setPageTitle(item);
                     break;
                 case "Zone":
-//                    System.out.println("good" + item);
                     mTransformer.convertZone(item);
                     break;
                 case "PriceEuro":
-//                    System.out.println("good " + item);
                     mTransformer.convertToPriceList(item);
                     break;
                 case "NoOfRooms":
-//                    System.out.println("good " + item);
                     mTransformer.setNoOfRooms(Integer.valueOf(item));
                     break;
                 case "UsefulArea":
-//                    System.out.println("good " + item);
                     mTransformer.convertToUsefulArea(item);
                     break;
                 case "TotalUsefulArea":
-//                    System.out.println("good " + item);
                     mTransformer.convertToTotalUsefulArea(item);
                     break;
                 case "BuiltSurface":
-//                    System.out.println("good " + item);
                     mTransformer.convertToBuiltSurface(item);
                     break;
                 case "Partitioning":
-//                    System.out.println("good " + item);
                     mTransformer.setPartitioning(item.trim());
                     break;
                 case "Comfort":
-//                    System.out.println("good " + item);
                     mTransformer.setComfort(item.trim());
                     break;
                 case "Floor":
-//                    System.out.println("good " + item);
                     mTransformer.convertFloorItem(item);
                     break;
                 case "NoOfKitchens":
-//                    System.out.println("good " + item);
                     mTransformer.setNoOfKitchens(Integer.valueOf(item));
                     break;
                 case "NoOfBathrooms":
-//                    System.out.println("good " + item);
                     mTransformer.setNoOfBathrooms(Integer.valueOf(item));
                     break;
                 case "ConstructionYear":
-//                    System.out.println("good " + item);
                     mTransformer.convertToConstructionYear(item);
                     break;
                 case "ResistanceStructure":
-//                    System.out.println("good " + item);
                     mTransformer.setResistanceStructure(item.trim());
                     break;
                 case "BuildingType":
-//                    System.out.println("good " + item);
                     mTransformer.setBuildingType(item.trim());
                     break;
                 case "TotalFloors":
-//                    System.out.println("good " + item);
 //                    mTransformer.setTotalFloors();
                     break;
                 case "NoOfBalconies":
-//                    System.out.println("good " + item);
                     mTransformer.convertToNoOfBalconies(item);
                     break;
                 case "PageId":
-//                    System.out.println("good " + item);
                     mTransformer.setPageId(item.trim());
                     break;
                 case "LastUpdate":
-//                    System.out.println("good " + item);
                     mTransformer.convertToLastUpdated(item);
                     break;
                 case "Image1":
-//                    System.out.println("good " + item);
                     mTransformer.setImage1(item.trim());
                     break;
                 case "Image2":
-//                    System.out.println("good " + item);
                     mTransformer.setImage2(item.trim());
                     break;
                 default:

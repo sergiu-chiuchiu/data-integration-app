@@ -3,6 +3,7 @@ package org.devon.app.entities.transformers;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.devon.app.entities.AdvertisementPage;
 
 import java.util.Calendar;
 import java.util.Map;
@@ -31,4 +32,5 @@ public abstract class AdvertisementPageTransformer {
     private String image1;
     private String image2;
 
+    public abstract AdvertisementPage mapTransformerToEntity();
 }

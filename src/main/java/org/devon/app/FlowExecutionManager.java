@@ -16,12 +16,10 @@ public class FlowExecutionManager {
     private IintegrationService integrationService;
 
     public void execute() {
-//        File tstFile = new File("../../UiPathProjects/WebCrawlerIm/myData.csv");
-        File tstFile = new File("../../UiPathProjects/WebCrawlerSt/myDataSt.csv");
-
-
         BufferedReader br;
         try {
+//        File tstFile = new File("../../UiPathProjects/WebCrawlerIm/myData.csv");
+            File tstFile = new File("../../UiPathProjects/WebCrawlerSt/myDataSt.csv");
             br = new BufferedReader(new FileReader(tstFile));
             integrationService.mapStreamToTransformer(br);
         } catch (FileNotFoundException e) {

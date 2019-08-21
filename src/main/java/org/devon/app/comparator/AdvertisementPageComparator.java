@@ -1,4 +1,4 @@
-package org.devon.app.Comparator;
+package org.devon.app.comparator;
 
 import org.devon.app.entities.AdvertisementPage;
 import org.devon.app.entities.Price;
