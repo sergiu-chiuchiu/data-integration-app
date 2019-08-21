@@ -1,7 +1,6 @@
 package org.devon.app.entities.transformers;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.devon.app.entities.*;
 import org.devon.app.entities.enums.CurrencyType;

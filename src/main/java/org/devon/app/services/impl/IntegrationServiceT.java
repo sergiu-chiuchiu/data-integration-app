@@ -1,17 +1,12 @@
 package org.devon.app.services.impl;
 
 import com.opencsv.CSVReader;
-import org.devon.app.comparator.AdvertisementPageComparator;
 import org.devon.app.ConsoleInteractions;
-import org.devon.app.entities.*;
-import org.devon.app.entities.enums.CurrencyType;
-import org.devon.app.entities.enums.PageSource;
-import org.devon.app.entities.enums.Partitioning;
+import org.devon.app.comparator.AdvertisementPageComparator;
 import org.devon.app.entities.transformers.AdvertisementPageTTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
 import org.devon.app.repositories.AdvertisementPageRepository;
-import org.devon.app.utils.Constants;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
 
 @Service
 public class IntegrationServiceT extends AIntegrationService {

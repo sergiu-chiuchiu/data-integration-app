@@ -1,7 +1,6 @@
 package org.devon.app.entities.converters;
 
 import org.devon.app.entities.enums.ComfortType;
-import org.devon.app.entities.enums.Partitioning;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
