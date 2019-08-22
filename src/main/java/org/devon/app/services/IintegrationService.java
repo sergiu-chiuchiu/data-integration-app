@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IintegrationService {
 
-    List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br);
+    List<Class<? extends AdvertisementPageTransformer>> mapStreamToEntities(BufferedReader br);
 
     Boolean checkForDuplicatesBetween(AdvertisementPage apToCheck);
 

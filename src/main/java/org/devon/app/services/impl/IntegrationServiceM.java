@@ -31,7 +31,7 @@ public class IntegrationServiceM extends AIntegrationService {
     }
 
     @Override
-    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToEntities(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);
             List<String> header = getDataHeader(csvReader);

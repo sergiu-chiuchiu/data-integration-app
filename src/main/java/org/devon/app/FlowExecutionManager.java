@@ -24,7 +24,7 @@ public class FlowExecutionManager {
 //        File tstFile = new File("../../UiPathProjects/WebCrawlerIm/myData.csv");
             File tstFile = new File("../../UiPathProjects/WebCrawlerSt/myDataSt.csv");
             br = new BufferedReader(new FileReader(tstFile));
-            integrationService.mapStreamToTransformer(br);
+            integrationService.mapStreamToEntities(br);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

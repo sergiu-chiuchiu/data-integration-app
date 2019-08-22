@@ -30,7 +30,7 @@ public class IntegrationServiceT extends AIntegrationService {
         this.consoleInteractions = consoleInteractions;
     }
 
-    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToEntities(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);
             List<String> header = getDataHeader(csvReader);
@@ -38,7 +38,7 @@ public class IntegrationServiceT extends AIntegrationService {
             String[] nextRecord;
             int cnt = 0;
             while ((nextRecord = csvReader.readNext()) != null) {
-                System.out.println("<-- " + cnt++ + " -->");
+                System.out.println("<-- " + ++cnt + " -->");
 
                 AdvertisementPageTTransformer tTransformer = new AdvertisementPageTTransformer();
 
