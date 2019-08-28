@@ -1,3 +1,3 @@
 Data Integration applicatiton
 
-Provides extract, transform, load (ETL) of data functionalities for input originated from different datasources.
+Provides functionalities for extracting, transforming and loadind (ETL) the data into the database for input originated from different datasources.
