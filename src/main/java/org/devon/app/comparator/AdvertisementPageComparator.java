@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.devon.app.utils.Constants.*;
+
 @Component
 public class AdvertisementPageComparator {
 
@@ -43,9 +45,9 @@ public class AdvertisementPageComparator {
         Double score = 0.0;
 
         Map<String[], Double> categoryScore = new HashMap<>();
-        categoryScore.put(highScore, 15.0);
-        categoryScore.put(mediumScore, 10.0);
-        categoryScore.put(lowScore, 5.5);
+        categoryScore.put(highScore, FIFTEEN);
+        categoryScore.put(mediumScore, TEN);
+        categoryScore.put(lowScore, FIVE_AND_HALF);
 
         Double maxScore = 0.0;
         for (String[] category : categoryScore.keySet()) {

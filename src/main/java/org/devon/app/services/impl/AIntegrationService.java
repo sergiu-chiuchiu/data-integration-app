@@ -51,9 +51,9 @@ public abstract class AIntegrationService implements IintegrationService {
             Double duplScore = advertisementPageComparator.comparePages(existingAp, apToCheck);
             Boolean result = duplScore >= Constants.DUPLICATE_TRESHOLD;
             if (result) {
-                System.out.println(">>>>>>>>>> For new record with pageID " + apToCheck.getPageId()
+                System.out.println("For new record with pageID " + apToCheck.getPageId()
                         + " there have been found a potential duplicate in record with page ID "
-                        + existingAp.getPageId() + " with a duplicate percentage of: " + duplScore * 100 + "% <<<<<<<<<<<<<<");
+                        + existingAp.getPageId() + " with a duplicate percentage of: " + duplScore * 100 + "%");
                 System.out.println("New record: " + apToCheck.toString());
                 System.out.println("Existing record: " + existingAp.toString());
                 Boolean shouldSaveUserDecision = consoleInteractions.askForDuplicatePersistence();

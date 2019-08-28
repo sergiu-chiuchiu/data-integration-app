@@ -39,7 +39,7 @@ public class IntegrationServiceM extends AIntegrationService {
             String[] nextRecord;
             int cnt = 0;
             while ((nextRecord = csvReader.readNext()) != null) {
-                System.out.println("<-- " + ++cnt + " -->");
+                System.out.println("<-- " + cnt++ + " -->");
                 AdvertisementPageMTransformer mTransformer = new AdvertisementPageMTransformer();
                 for (int c = 0; c < nextRecord.length; c++) {
                     mapItemToTransformer(header.get(c), nextRecord[c], mTransformer);

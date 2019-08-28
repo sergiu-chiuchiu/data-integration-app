@@ -38,7 +38,7 @@ public class IntegrationServiceT extends AIntegrationService {
             String[] nextRecord;
             int cnt = 0;
             while ((nextRecord = csvReader.readNext()) != null) {
-                System.out.println("<-- " + ++cnt + " -->");
+                System.out.println("<-- " + cnt++ + " -->");
 
                 AdvertisementPageTTransformer tTransformer = new AdvertisementPageTTransformer();
 
