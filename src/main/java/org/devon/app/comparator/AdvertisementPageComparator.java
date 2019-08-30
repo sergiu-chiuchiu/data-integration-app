@@ -43,13 +43,13 @@ public class AdvertisementPageComparator {
 
     private Double calculateDuplicateScore(Map<String, Boolean> duplicateFields) {
         Double score = 0.0;
+        Double maxScore = 0.0;
 
         Map<String[], Double> categoryScore = new HashMap<>();
         categoryScore.put(highScore, FIFTEEN);
         categoryScore.put(mediumScore, TEN);
         categoryScore.put(lowScore, FIVE_AND_HALF);
 
-        Double maxScore = 0.0;
         for (String[] category : categoryScore.keySet()) {
             for (String field : category) {
                 if (duplicateFields.get(field)) {
@@ -58,7 +58,6 @@ public class AdvertisementPageComparator {
             }
             maxScore += categoryScore.get(category) * category.length;
         }
-
         return score / maxScore;
     }
 
