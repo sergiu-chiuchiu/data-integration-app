@@ -8,7 +8,7 @@ Required IDE plugins:
 Database:  PostgreSQL 10
 
 Key dependencies: 
-1. Spring Boot, 
+1. Spring Boot 
 2. Spring Data
 3. Lombok
 4. modelmapper
