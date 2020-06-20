@@ -56,7 +56,7 @@ public class IntegrationServiceM extends AIntegrationService {
     private void mapItemToTransformer(String header, String item, AdvertisementPageMTransformer mTransformer) {
         try {
             if (item.equals("")) {
-                throw new EmptyFieldException(header + " field is empty");
+                throw new EmptyFieldException("field is empty");
             }
 
             switch (header) {

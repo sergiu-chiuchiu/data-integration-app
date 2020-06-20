@@ -13,7 +13,7 @@ public class DataIntegrationApplication implements CommandLineRunner {
 
     @Autowired
     FlowExecutionManager executionManager;
-    private static Logger LOG = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(DataIntegrationApplication.class);
 
     public static void main(String[] args) {
@@ -28,8 +28,8 @@ public class DataIntegrationApplication implements CommandLineRunner {
         for (int i = 0; i < args.length; ++i) {
             LOG.info("args[{}]: {}", i, args[i]);
         }
-        executionManager.setDataSource(Constants.DATA_SOURCE_M);
-        executionManager.execute();
+        executionManager.setDataSource(Constants.DATA_SOURCE_T);
+        executionManager.execute();notify();
     }
 
 }

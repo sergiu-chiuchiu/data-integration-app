@@ -242,7 +242,7 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
         try {
             if (lastUpdatedStr.contains("azi")) {
                 // just set the field at the end of method
-            } else if (lastUpdatedStr.contains("Ieri")) {
+            } else if (lastUpdatedStr.toLowerCase().contains("ieri")) {
                 lastUpdated.add(Calendar.DATE, -1);
             } else if (lastUpdatedStr.contains("Actualizat")) {
                 lastUpdatedStr = lastUpdatedStr.replace("Actualizat in ", "").trim();
