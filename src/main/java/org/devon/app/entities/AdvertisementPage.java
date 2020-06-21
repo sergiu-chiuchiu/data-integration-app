@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Setter
 @Entity
 @Getter

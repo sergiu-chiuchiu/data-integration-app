@@ -9,9 +9,9 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Setter(value = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Setter(value = AccessLevel.PUBLIC)
 @Builder
 @ToString
 public class Construction {

@@ -125,7 +125,7 @@ public class AdvertisementPageComparator {
     }
 
 
-    private Boolean checkIntegerDuplicate(Integer existingVal, Integer newVal) {
+    private Boolean     checkIntegerDuplicate(Integer existingVal, Integer newVal) {
         if (existingVal == null || newVal == null) {
             return false;
         } else if (existingVal.equals(newVal)) {
