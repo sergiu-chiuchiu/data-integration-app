@@ -1,7 +1,7 @@
 package org.devon.app.utils;
 
 public class Constants {
-    public static final Double DUPLICATE_TRESHOLD = 0.3;
+    public static final Double DUPLICATE_TRESHOLD = 0.8;
     public static final String DATA_SOURCE_M = "M";
     public static final String DATA_SOURCE_T = "T";
     public static final Double FIFTEEN = 15.0;

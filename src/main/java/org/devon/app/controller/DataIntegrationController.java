@@ -1,10 +1,11 @@
 package org.devon.app.controller;
 
 
-import org.devon.app.dto.RawDataStDto;
-import org.devon.app.dto.TestDto;
-import org.devon.app.services.Test;
+import org.devon.app.dto.RawDataTDto;
+import org.devon.app.mapper.TransformerMapper;
+import org.devon.app.services.IintegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,26 +15,24 @@ import java.util.List;
 @RequestMapping(value = "/api/data-integration")
 public class DataIntegrationController {
 
-    Test test;
+    TransformerMapper transformerMapper;
+    IintegrationService iintegrationService;
 
     @Autowired
-    public DataIntegrationController(Test thetest) {
-        this.test = thetest;
+    public DataIntegrationController(
+            TransformerMapper transformerMapper,
+            @Qualifier("integrationServiceT") IintegrationService iintegrationService
+    ) {
+        this.transformerMapper = transformerMapper;
+        this.iintegrationService = iintegrationService;
     }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public String test() {
-        System.out.println("Get called");
-        return "Hello";
-    }
-
-    @PostMapping
+    @PostMapping(path = "/t")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveCollectedDataSt(@RequestBody List<RawDataStDto> rawDataStDtoList) {
-        RawDataStDto rawDataStDto = rawDataStDtoList.get(0);
-        System.out.println("Post endpoint caleld!! " + rawDataStDto.getPageTitle());
-
+    public void saveCollectedDataSt(@RequestBody List<RawDataTDto> rawDataTDtoList) {
+        RawDataTDto rawDataTDto = rawDataTDtoList.get(0);
+        System.out.println("Post endpoint T called. Page title: " + rawDataTDto.getPageTitle());
+        iintegrationService.mapDtoToTransformer(rawDataTDto);
     }
 
 }

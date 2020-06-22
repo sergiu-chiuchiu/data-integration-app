@@ -18,7 +18,6 @@ import java.util.*;
 public class AdvertisementPageTTransformer extends AdvertisementPageTransformer {
 
     private String estateState;
-    private String propertyType;
 
     public AdvertisementPageTTransformer() {
         setPageSource("T");
@@ -98,11 +97,13 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
 
     public void convertZone(String zone) {
         try {
-            int separatorIdx = zone.indexOf(",");
-            String region = zone.substring(0, separatorIdx).trim();
-            String neighbourhood = zone.substring(separatorIdx + 1).trim();
-            super.setRegion(region);
-            super.setNeighbourhood(neighbourhood);
+            if (zone != null) {
+                int separatorIdx = zone.indexOf(',');
+                String region = zone.substring(0, separatorIdx).trim();
+                String neighbourhood = zone.substring(separatorIdx + 1).trim();
+                super.setRegion(region);
+                super.setNeighbourhood(neighbourhood);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,17 +133,27 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
     }
 
     public void convertToUsefulArea(String usefulAreaStr) {
-        Double usefulArea = Double.valueOf(usefulAreaStr.trim());
-        super.setUsefulArea(usefulArea);
+        if (usefulAreaStr != null) {
+            NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+            try {
+                Number number = format.parse(usefulAreaStr);
+                Double usefulArea = number.doubleValue();
+                super.setUsefulArea(usefulArea);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void convertToBuiltSurface(String builtSurfaceStr) {
         try {
-            int idx = builtSurfaceStr.indexOf("m");
-            builtSurfaceStr = builtSurfaceStr.substring(0, idx).trim();
-            Number bsNumber = NumberFormat.getInstance(Locale.FRANCE).parse(builtSurfaceStr);
-            Double builtSurface = bsNumber.doubleValue();
-            super.setBuiltSurface(builtSurface);
+            if (builtSurfaceStr != null) {
+                int idx = builtSurfaceStr.indexOf('m');
+                builtSurfaceStr = builtSurfaceStr.substring(0, idx).trim();
+                Number bsNumber = NumberFormat.getInstance(Locale.FRANCE).parse(builtSurfaceStr);
+                Double builtSurface = bsNumber.doubleValue();
+                super.setBuiltSurface(builtSurface);
+            }
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
@@ -155,13 +166,15 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
 
     public void convertFloorItem(String floorStr) {
         try {
-            Integer floor;
-            if (floorStr.equalsIgnoreCase("Parter")) {
-                floor = 0;
-            } else {
-                floor = Integer.valueOf(floorStr);
+            if (floorStr != null) {
+                Integer floor;
+                if (floorStr.equalsIgnoreCase("Parter")) {
+                    floor = 0;
+                } else {
+                    floor = Integer.valueOf(floorStr);
+                }
+                super.setFloorNo(floor);
             }
-            super.setFloorNo(floor);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,8 +182,13 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
 
     public void convertToNoOfBathrooms(String noOfBathStr) {
         try {
-            Integer noOfBahtrooms = Integer.valueOf(noOfBathStr);
-            super.setNoOfBathrooms(noOfBahtrooms);
+            if (noOfBathStr != null) {
+                if (noOfBathStr.contains("multe")) {
+                    noOfBathStr = noOfBathStr.substring(0, 1);
+                }
+                Integer noOfBahtrooms = Integer.valueOf(noOfBathStr);
+                super.setNoOfBathrooms(noOfBahtrooms);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,7 +203,8 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
         }
     }
 
-    public void convertToBuildingType(String bldType) {
+    @Override
+    public void setBuildingType(String bldType) {
         if (bldType.equalsIgnoreCase("apartament")) {
             bldType = "bloc de apartamente";
         } else {
@@ -211,33 +230,36 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
 
     public void convertToLastUpdated(String lastUpdatedStr) {
         try {
-            String updatepoint = "Data modificarii:";
-            int length = updatepoint.length();
-            int startIdx = lastUpdatedStr.indexOf(updatepoint);
-            lastUpdatedStr = lastUpdatedStr
-                    .substring(startIdx + length);
-            lastUpdatedStr = lastUpdatedStr
-                    .substring(0, lastUpdatedStr.indexOf("în urmă"))
-                    .trim();
+            if (lastUpdatedStr != null) {
+                String updatepoint = "Data modificarii:";
+                int length = updatepoint.length();
+                int startIdx = lastUpdatedStr.indexOf(updatepoint);
+                lastUpdatedStr = lastUpdatedStr
+                        .substring(startIdx + length);
+                lastUpdatedStr = lastUpdatedStr
+                        .substring(0, lastUpdatedStr.indexOf("în urmă"))
+                        .trim();
 
-            Calendar lastUpdated = Calendar.getInstance();
-            Integer lastUpdatedInt;
-            if (lastUpdatedStr.contains("ore")) {
-                lastUpdatedInt = Integer.valueOf(lastUpdatedStr
-                        .replace("ore", "")
-                        .trim()
-                );
-                lastUpdated.add(Calendar.HOUR, -lastUpdatedInt);
-            } else if (lastUpdatedStr.contains("o zi")) {
-                lastUpdated.add(Calendar.DATE, -1);
-            } else if (lastUpdatedStr.contains("zile")) {
-                lastUpdatedInt = Integer.valueOf(lastUpdatedStr
-                        .replace("zile", "")
-                        .trim()
-                );
-                lastUpdated.add(Calendar.DATE, -lastUpdatedInt);
+                Calendar lastUpdated = Calendar.getInstance();
+                Integer lastUpdatedInt;
+                if (lastUpdatedStr.contains("ore")) {
+                    lastUpdatedInt = Integer.valueOf(lastUpdatedStr
+                            .replace("ore", "")
+                            .replace("circa", "")
+                            .trim()
+                    );
+                    lastUpdated.add(Calendar.HOUR, -lastUpdatedInt);
+                } else if (lastUpdatedStr.contains("o zi")) {
+                    lastUpdated.add(Calendar.DATE, -1);
+                } else if (lastUpdatedStr.contains("zile")) {
+                    lastUpdatedInt = Integer.valueOf(lastUpdatedStr
+                            .replace("zile", "")
+                            .trim()
+                    );
+                    lastUpdated.add(Calendar.DATE, -lastUpdatedInt);
+                }
+                super.setLastUpdated(lastUpdated);
             }
-            super.setLastUpdated(lastUpdated);
         } catch (StringIndexOutOfBoundsException e) {
             e.printStackTrace();
         }

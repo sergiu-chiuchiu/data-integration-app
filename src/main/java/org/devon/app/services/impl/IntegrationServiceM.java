@@ -3,9 +3,11 @@ package org.devon.app.services.impl;
 import com.opencsv.CSVReader;
 import org.devon.app.ConsoleInteractions;
 import org.devon.app.comparator.AdvertisementPageComparator;
+import org.devon.app.dto.RawDataTDto;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
+import org.devon.app.mapper.TransformerMapper;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -23,15 +25,25 @@ public class IntegrationServiceM extends AIntegrationService {
             .getLogger(IntegrationServiceM.class);
 
     @Autowired
-    public IntegrationServiceM(AdvertisementPageRepository advertisementPageRepository, ModelMapper modelMapper, AdvertisementPageComparator advertisementPageComparator, ConsoleInteractions consoleInteractions) {
+    public IntegrationServiceM(AdvertisementPageRepository advertisementPageRepository,
+                               ModelMapper modelMapper,
+                               AdvertisementPageComparator advertisementPageComparator,
+                               ConsoleInteractions consoleInteractions,
+                               TransformerMapper transformerMapper) {
         this.advertisementPageRepository = advertisementPageRepository;
         this.modelMapper = modelMapper;
         this.advertisementPageComparator = advertisementPageComparator;
         this.consoleInteractions = consoleInteractions;
+        this.transformerMapper = transformerMapper;
     }
 
     @Override
-    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToEntities(BufferedReader br) {
+    public void mapDtoToTransformer(RawDataTDto rawDataTDto) {
+
+    }
+
+    @Override
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);
             List<String> header = getDataHeader(csvReader);
@@ -52,6 +64,8 @@ public class IntegrationServiceM extends AIntegrationService {
         }
         return null;
     }
+
+
 
     private void mapItemToTransformer(String header, String item, AdvertisementPageMTransformer mTransformer) {
         try {

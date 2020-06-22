@@ -36,12 +36,12 @@ public class FlowExecutionManager {
                 case Constants.DATA_SOURCE_M:
                     dataFileCSV = new File("myData.csv");
                     br = new BufferedReader(new FileReader(dataFileCSV));
-                    integrationServiceM.mapStreamToEntities(br);
+                    integrationServiceM.mapStreamToTransformer(br);
                     break;
                 case Constants.DATA_SOURCE_T:
                     dataFileCSV = new File("myDataSt.csv");
                     br = new BufferedReader(new FileReader(dataFileCSV));
-                    integrationServiceT.mapStreamToEntities(br);
+                    integrationServiceT.mapStreamToTransformer(br);
                     break;
                 default:
                     LOG.error("Unknown data source type. Cannot run the " +

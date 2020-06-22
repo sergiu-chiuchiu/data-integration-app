@@ -3,9 +3,11 @@ package org.devon.app.services.impl;
 import com.opencsv.CSVReader;
 import org.devon.app.ConsoleInteractions;
 import org.devon.app.comparator.AdvertisementPageComparator;
+import org.devon.app.dto.RawDataTDto;
 import org.devon.app.entities.transformers.AdvertisementPageTTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
+import org.devon.app.mapper.TransformerMapper;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -19,18 +21,31 @@ import java.util.List;
 
 @Service
 public class IntegrationServiceT extends AIntegrationService {
+
+    public static final boolean IS_FROM_INTEGRATION_ENDPOINT = true;
     private static Logger LOG = LoggerFactory
             .getLogger(IntegrationServiceM.class);
 
     @Autowired
-    public IntegrationServiceT(AdvertisementPageRepository advertisementPageRepository, ModelMapper modelMapper, AdvertisementPageComparator advertisementPageComparator, ConsoleInteractions consoleInteractions) {
+    public IntegrationServiceT(AdvertisementPageRepository advertisementPageRepository,
+                               ModelMapper modelMapper,
+                               AdvertisementPageComparator advertisementPageComparator,
+                               ConsoleInteractions consoleInteractions,
+                               TransformerMapper transformerMapper) {
         this.advertisementPageRepository = advertisementPageRepository;
         this.modelMapper = modelMapper;
         this.advertisementPageComparator = advertisementPageComparator;
         this.consoleInteractions = consoleInteractions;
+        this.transformerMapper = transformerMapper;
     }
 
-    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToEntities(BufferedReader br) {
+    public void mapDtoToTransformer(RawDataTDto rawDataTDto) {
+        AdvertisementPageTTransformer advertisementPageTTransformer = transformerMapper.rawDataTDtoToAdvertisementPageTTransformer(rawDataTDto);
+        validateTransformerAndPersist(advertisementPageTTransformer, IS_FROM_INTEGRATION_ENDPOINT);
+    }
+
+    @Deprecated
+    public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);
             List<String> header = getDataHeader(csvReader);
@@ -42,7 +57,7 @@ public class IntegrationServiceT extends AIntegrationService {
 
                 AdvertisementPageTTransformer tTransformer = new AdvertisementPageTTransformer();
 
-                for (int c = 0; c < nextRecord.length; c ++) {
+                for (int c = 0; c < nextRecord.length; c++) {
                     mapItemToTransformer(header.get(c), nextRecord[c], tTransformer);
                 }
 
@@ -92,7 +107,7 @@ public class IntegrationServiceT extends AIntegrationService {
                     tTransformer.convertToConstructionYear(item);
                     break;
                 case "PropertyType":
-                    tTransformer.convertToBuildingType(item);
+                    tTransformer.setBuildingType(item);
                     break;
                 case "TotalFloors":
                     tTransformer.convertToTotalFloors(item);
