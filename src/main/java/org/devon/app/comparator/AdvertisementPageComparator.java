@@ -14,9 +14,9 @@ import static org.devon.app.utils.Constants.*;
 @Component
 public class AdvertisementPageComparator {
 
-    private String[] highScore = {"isPageTitleDuplicate"};
-    private String[] mediumScore = {"isPriceDuplicate","isUsefulAreaDuplicate", "isBuiltSurfaceDuplicate", "isNeighbourhoodDuplicate", "isConstructionYearDuplicate"};
-    private String[] lowScore = {"isRegionDuplicate", "isPartitioningDuplicate", "isNoOfRoomsDuplicate", "isNoOfBathroomsDuplicate", "isFloorDuplicate", "isTotalFloorsDuplicate"};
+    private final String[] highScore = {"isPageTitleDuplicate"};
+    private final String[] mediumScore = {"isPriceDuplicate","isUsefulAreaDuplicate", "isBuiltSurfaceDuplicate", "isNeighbourhoodDuplicate", "isConstructionYearDuplicate"};
+    private final String[] lowScore = {"isRegionDuplicate", "isPartitioningDuplicate", "isNoOfRoomsDuplicate", "isNoOfBathroomsDuplicate", "isFloorDuplicate", "isTotalFloorsDuplicate"};
 
 
     public Double comparePages(AdvertisementPage existingPage, AdvertisementPage newPage) {

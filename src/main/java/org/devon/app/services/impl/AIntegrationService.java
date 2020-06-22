@@ -55,17 +55,30 @@ public abstract class AIntegrationService implements IintegrationService {
         for (AdvertisementPage existingAp : apList) {
             Double duplScore = advertisementPageComparator.comparePages(existingAp, apToCheck);
             boolean result = duplScore >= Constants.DUPLICATE_TRESHOLD;
-            if (result && !isFromIntegrationEndpoint) {
+            if (result) {
                 System.out.println("For new record with pageID " + apToCheck.getPageId()
                         + " there have been found a potential duplicate in record with page ID "
                         + existingAp.getPageId() + " with a duplicate percentage of: " + duplScore * 100 + "%");
                 System.out.println("New record: " + apToCheck.toString());
                 System.out.println("Existing record: " + existingAp.toString());
-                Boolean shouldSaveUserDecision = consoleInteractions.askForDuplicatePersistence();
-                return shouldSaveUserDecision;
+
+                boolean shouldSave = false;
+                if (!isFromIntegrationEndpoint) {
+                    shouldSave = consoleInteractions.askForDuplicatePersistence();
+                }
+                logShouldSaveConclusion(shouldSave);
+                return shouldSave;
             }
         }
         return true;
+    }
+
+    private void logShouldSaveConclusion(boolean shouldSave) {
+        if (shouldSave) {
+            System.out.println("Near duplicate found but saved at user request");
+        } else {
+            System.out.println("Near duplicate found aborted saving");
+        }
     }
 
     @Override

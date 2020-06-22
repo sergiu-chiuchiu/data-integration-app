@@ -44,7 +44,6 @@ public class IntegrationServiceT extends AIntegrationService {
         validateTransformerAndPersist(advertisementPageTTransformer, IS_FROM_INTEGRATION_ENDPOINT);
     }
 
-    @Deprecated
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);
@@ -128,7 +127,7 @@ public class IntegrationServiceT extends AIntegrationService {
                     tTransformer.setImage2(item);
                     break;
                 default:
-                    LOG.error("The header " + header + " could not be matched with a case");
+                    LOG.error(String.format("The header %s could not be matched with a case", header));
                     break;
             }
         } catch (EmptyFieldException e) {
