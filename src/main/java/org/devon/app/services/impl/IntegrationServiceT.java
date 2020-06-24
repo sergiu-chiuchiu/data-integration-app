@@ -39,11 +39,13 @@ public class IntegrationServiceT extends AIntegrationService {
         this.transformerMapper = transformerMapper;
     }
 
+    @Override
     public void mapDtoToTransformer(RawDataTDto rawDataTDto) {
         AdvertisementPageTTransformer advertisementPageTTransformer = transformerMapper.rawDataTDtoToAdvertisementPageTTransformer(rawDataTDto);
         validateTransformerAndPersist(advertisementPageTTransformer, IS_FROM_INTEGRATION_ENDPOINT);
     }
 
+    @Override
     public List<Class<? extends AdvertisementPageTransformer>> mapStreamToTransformer(BufferedReader br) {
         try {
             CSVReader csvReader = csvReaderInit(br);

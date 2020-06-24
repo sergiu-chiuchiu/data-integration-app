@@ -2,11 +2,9 @@ package org.devon.app.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.devon.app.entities.enums.Partitioning;
 
 @Getter
 @Setter
