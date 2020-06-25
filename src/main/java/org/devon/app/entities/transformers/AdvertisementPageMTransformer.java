@@ -108,15 +108,17 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertZone(String zone) {
         try {
-            int idx = zone.lastIndexOf("-");
-            zone = zone.substring(0, idx);
+            if (zone != null) {
+                int idx = zone.lastIndexOf("-");
+                zone = zone.substring(0, idx);
 
-            idx = zone.indexOf(", zona");
-            String region = zone.substring(0, idx).trim();
-            String neighbourhood = zone.substring(idx + 6).trim();
+                idx = zone.indexOf(", zona");
+                String region = zone.substring(0, idx).trim();
+                String neighbourhood = zone.substring(idx + 6).trim();
 
-            super.setRegion(region);
-            super.setNeighbourhood(neighbourhood);
+                super.setRegion(region);
+                super.setNeighbourhood(neighbourhood);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -150,10 +152,12 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToUsefulArea(String usefulArea) {
         try {
-            usefulArea = usefulArea.substring(0, usefulArea.indexOf(" mp"));
-            Number usefulAreaNumber = null;
-            usefulAreaNumber = NumberFormat.getInstance(Locale.FRANCE).parse(usefulArea);
-            super.setUsefulArea(usefulAreaNumber.doubleValue());
+            if (usefulArea != null) {
+                usefulArea = usefulArea.substring(0, usefulArea.indexOf(" mp"));
+                Number usefulAreaNumber = null;
+                usefulAreaNumber = NumberFormat.getInstance(Locale.FRANCE).parse(usefulArea);
+                super.setUsefulArea(usefulAreaNumber.doubleValue());
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -163,8 +167,10 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToTotalUsefulArea(String totalUsefulArea) {
         try {
-            totalUsefulArea = totalUsefulArea.substring(0, totalUsefulArea.indexOf(" mp"));
-            this.setTotalUsefulArea(Double.valueOf(totalUsefulArea));
+            if (totalUsefulArea != null) {
+                totalUsefulArea = totalUsefulArea.substring(0, totalUsefulArea.indexOf(" mp"));
+                this.setTotalUsefulArea(Double.valueOf(totalUsefulArea));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -172,10 +178,12 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToBuiltSurface(String builtSurface) {
         try {
-            builtSurface = builtSurface.substring(0, builtSurface.indexOf(" mp"));
-            Number builtSurfaceNumber = null;
-            builtSurfaceNumber = NumberFormat.getInstance(Locale.FRANCE).parse(builtSurface);
-            super.setBuiltSurface(builtSurfaceNumber.doubleValue());
+            if (builtSurface != null) {
+                builtSurface = builtSurface.substring(0, builtSurface.indexOf(" mp"));
+                Number builtSurfaceNumber;
+                builtSurfaceNumber = NumberFormat.getInstance(Locale.FRANCE).parse(builtSurface);
+                super.setBuiltSurface(builtSurfaceNumber.doubleValue());
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -185,22 +193,30 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertFloorItem(String floorItem) {
         try {
-            Integer floor = null;
-            Integer separatorIdx = floorItem.indexOf("/");
+            if (floorItem != null) {
+                Integer floor = null;
+                Integer separatorIdx = floorItem.indexOf('/');
 
-            if (floorItem.contains("Etaj")) {
-                floor = Integer.valueOf(floorItem
-                        .substring(4, separatorIdx)
-                        .trim());
-            } else if (floorItem.contains("Parter")) {
-                floor = 0;
-            } else if (floorItem.contains("Demisol")) {
-                floor = -1;
+                if (floorItem.contains("Etaj")) {
+                    if (separatorIdx != -1) {
+                        floor = Integer.valueOf(floorItem
+                                .substring(4, separatorIdx)
+                                .trim());
+                    } else {
+                        floor = Integer.valueOf(floorItem.replace("Etaj", "").trim());
+                    }
+                } else if (floorItem.contains("Parter")) {
+                    floor = 0;
+                } else if (floorItem.contains("Demisol")) {
+                    floor = -1;
+                }
+                super.setFloorNo(floor);
+                if (separatorIdx != -1) {
+                    super.setTotalFloors(Integer.valueOf(floorItem
+                            .substring(separatorIdx + 1)
+                            .trim()));
+                }
             }
-            super.setFloorNo(floor);
-            super.setTotalFloors(Integer.valueOf(floorItem
-                    .substring(separatorIdx + 1)
-                    .trim()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -208,9 +224,11 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToConstructionYear(String conYearStr) {
         try {
-            conYearStr = removeSusbstrFromParenthesis(conYearStr);
-            Integer conYear = Integer.valueOf(conYearStr.trim());
-            super.setConstructionYear(conYear);
+            if (conYearStr != null) {
+                conYearStr = removeSusbstrFromParenthesis(conYearStr);
+                Integer conYear = Integer.valueOf(conYearStr.trim());
+                super.setConstructionYear(conYear);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -218,9 +236,11 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     public void convertToNoOfBalconies(String nob) {
         try {
-            nob = removeSusbstrFromParenthesis(nob);
-            Integer noOfBalconies = Integer.valueOf(nob.trim());
-            this.setNoOfBalconies(noOfBalconies);
+            if (nob != null) {
+                nob = removeSusbstrFromParenthesis(nob);
+                Integer noOfBalconies = Integer.valueOf(nob.trim());
+                this.setNoOfBalconies(noOfBalconies);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -240,20 +260,22 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
     public void convertToLastUpdated(String lastUpdatedStr) {
         Calendar lastUpdated = Calendar.getInstance();
         try {
-            if (lastUpdatedStr.contains("azi")) {
-                // just set the field at the end of method
-            } else if (lastUpdatedStr.toLowerCase().contains("ieri")) {
-                lastUpdated.add(Calendar.DATE, -1);
-            } else if (lastUpdatedStr.contains("Actualizat")) {
-                lastUpdatedStr = lastUpdatedStr.replace("Actualizat in ", "").trim();
+            if (lastUpdatedStr != null) {
+                if (lastUpdatedStr.contains("azi")) {
+                    // just set the field at the end of method
+                } else if (lastUpdatedStr.toLowerCase().contains("ieri")) {
+                    lastUpdated.add(Calendar.DATE, -1);
+                } else if (lastUpdatedStr.contains("Actualizat")) {
+                    lastUpdatedStr = lastUpdatedStr.replace("Actualizat în", "").trim();
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-                Date date = sdf.parse(lastUpdatedStr);
-                lastUpdated.setTime(date);
-            } else {
-                lastUpdated = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                    Date date = sdf.parse(lastUpdatedStr);
+                    lastUpdated.setTime(date);
+                } else {
+                    lastUpdated = null;
+                }
+                super.setLastUpdated(lastUpdated);
             }
-            super.setLastUpdated(lastUpdated);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -261,8 +283,10 @@ public class AdvertisementPageMTransformer extends AdvertisementPageTransformer 
 
     @Override
     public void setPageTitle(String pageTitle) {
-        String pt = pageTitle.replace("\"", "").trim();
-        super.setPageTitle(pt == "" ? null : pt);
+        if (pageTitle != null) {
+            String pt = pageTitle.replace("\"", "").trim();
+            super.setPageTitle(pt.equals("") ? null : pt);
+        }
     }
 
 }

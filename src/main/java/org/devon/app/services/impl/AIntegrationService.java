@@ -7,9 +7,12 @@ import com.opencsv.CSVReaderBuilder;
 import org.devon.app.ConsoleInteractions;
 import org.devon.app.comparator.AdvertisementPageComparator;
 import org.devon.app.entities.AdvertisementPage;
+import org.devon.app.entities.Estate;
+import org.devon.app.entities.Image;
+import org.devon.app.entities.Price;
 import org.devon.app.entities.enums.PageSource;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
-import org.devon.app.mapper.TransformerMapper;
+import org.devon.app.mapper.TransformerMapperT;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.devon.app.services.IintegrationService;
 import org.devon.app.utils.Constants;
@@ -24,12 +27,12 @@ import java.util.List;
 public abstract class AIntegrationService implements IintegrationService {
 
     public static final boolean IS_NOT_FROM_INTEGRATION_ENDPOINT = false;
+    public static final boolean IS_FROM_INTEGRATION_ENDPOINT = true;
 
     AdvertisementPageRepository advertisementPageRepository;
     ModelMapper modelMapper;
     AdvertisementPageComparator advertisementPageComparator;
     ConsoleInteractions consoleInteractions;
-    TransformerMapper transformerMapper;
 
     CSVReader csvReaderInit(BufferedReader br) {
         CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
@@ -113,6 +116,7 @@ public abstract class AIntegrationService implements IintegrationService {
             if (isModifiedRecord) {
                 AdvertisementPage updatedAp = transformer.mapTransformerToEntity();
                 AdvertisementPage ap = advertisementPageRepository.findByPageId(updatedAp.getPageId());
+                setIds(ap, updatedAp);
                 modelMapper.map(updatedAp, ap);
                 advertisementPageRepository.save(ap);
             }
@@ -121,6 +125,32 @@ public abstract class AIntegrationService implements IintegrationService {
             boolean shouldSave = checkForDuplicatesBetween(ap, isFromIntegrationEndpoint);
             if (shouldSave) {
                 advertisementPageRepository.save(ap);
+            }
+        }
+    }
+
+    private void setIds(AdvertisementPage ap, AdvertisementPage updatedAp) {
+        Estate e = ap.getEstate();
+        Estate updatedE = updatedAp.getEstate();
+
+        updatedE.setId(e.getId());
+        updatedE.getConstruction().setId(e.getConstruction().getId());
+        updatedE.getArea().setId(e.getArea().getId());
+        updatedE.getRooms().setId(e.getRooms().getId());
+
+        for (Image i : updatedAp.getImages()) {
+            for(Image iAp : ap.getImages()) {
+                if (iAp.getImageName().equalsIgnoreCase(i.getImageName())) {
+                    i.setId(iAp.getId());
+                }
+            }
+        }
+
+        for (Price p : updatedAp.getPriceList()) {
+            for(Price pAp : ap.getPriceList()) {
+                if (pAp.getCurrencyType().equals(p.getCurrencyType())) {
+                    p.setId(pAp.getId());
+                }
             }
         }
     }

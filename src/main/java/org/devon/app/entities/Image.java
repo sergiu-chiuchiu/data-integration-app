@@ -18,7 +18,7 @@ public class Image {
     Long id;
     String imageName;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @ToString.Exclude
     AdvertisementPage advertisementPage;
 

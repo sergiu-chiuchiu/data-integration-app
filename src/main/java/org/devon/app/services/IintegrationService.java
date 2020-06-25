@@ -1,5 +1,7 @@
 package org.devon.app.services;
 
+import org.devon.app.dto.RawDataDto;
+import org.devon.app.dto.RawDataMDto;
 import org.devon.app.dto.RawDataTDto;
 import org.devon.app.entities.AdvertisementPage;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
@@ -17,6 +19,7 @@ public interface IintegrationService {
 
     <E extends AdvertisementPageTransformer> Boolean checkForRecordUpdate(E apTransformer);
 
-    void mapDtoToTransformer(RawDataTDto rawDataTDto);
+    <E extends RawDataDto> void mapDtoToTransformer(E rawDataTDto);
 
+//    void mapDtoToTransformerM(RawDataMDto rawDataMDto);
 }

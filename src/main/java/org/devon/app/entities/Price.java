@@ -1,5 +1,6 @@
 package org.devon.app.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.devon.app.entities.enums.CurrencyType;
 
@@ -21,7 +22,7 @@ public class Price {
     @Enumerated(EnumType.STRING)
     CurrencyType currencyType;
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     @ToString.Exclude
     AdvertisementPage advertisementPage;
 

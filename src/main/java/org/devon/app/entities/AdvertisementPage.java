@@ -5,10 +5,9 @@ import org.devon.app.entities.enums.PageSource;
 
 import javax.persistence.*;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Setter
 @Entity
@@ -25,8 +24,8 @@ public class AdvertisementPage {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Estate estate;
 
-    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    Set<Price> priceList = new HashSet<>();
+    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    Set<Price> priceList;
 
     String pageId;
 //    String publishDate;
@@ -35,8 +34,8 @@ public class AdvertisementPage {
     @Enumerated(EnumType.STRING)
     PageSource pageSource;
 
-    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    Set<Image> images = new HashSet<>();
+    @OneToMany(mappedBy = "advertisementPage", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    Set<Image> images;
 
 }
 

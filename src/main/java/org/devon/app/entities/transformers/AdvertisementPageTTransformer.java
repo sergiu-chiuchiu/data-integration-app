@@ -170,6 +170,8 @@ public class AdvertisementPageTTransformer extends AdvertisementPageTransformer 
                 Integer floor;
                 if (floorStr.equalsIgnoreCase("Parter")) {
                     floor = 0;
+                } else if (floorStr.equalsIgnoreCase("Mansarda")) {
+                    floor = this.getTotalFloors();
                 } else {
                     floor = Integer.valueOf(floorStr);
                 }

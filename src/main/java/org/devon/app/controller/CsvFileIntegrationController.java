@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.devon.app.utils.Constants.DATA_SOURCE_M;
 import static org.devon.app.utils.Constants.DATA_SOURCE_T;
 
 @RestController
@@ -20,11 +21,17 @@ public class CsvFileIntegrationController {
     }
 
     @GetMapping(path = "/t")
-    public void integrateCsvFile() {
+    public void integrateCsvFileT() {
         System.out.println("Endpoint /api/csv-integration/t  called.");
         flowExecutionManager.setDataSource(DATA_SOURCE_T);
         flowExecutionManager.execute();
     }
 
+    @GetMapping(path = "/m")
+    public void integrateCsvFileM() {
+        System.out.println("Endpoint /api/csv-integration/m  called.");
+        flowExecutionManager.setDataSource(DATA_SOURCE_M);
+        flowExecutionManager.execute();
+    }
 
 }

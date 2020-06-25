@@ -3,11 +3,13 @@ package org.devon.app.services.impl;
 import com.opencsv.CSVReader;
 import org.devon.app.ConsoleInteractions;
 import org.devon.app.comparator.AdvertisementPageComparator;
-import org.devon.app.dto.RawDataTDto;
+import org.devon.app.dto.RawDataDto;
+import org.devon.app.dto.RawDataMDto;
 import org.devon.app.entities.transformers.AdvertisementPageMTransformer;
 import org.devon.app.entities.transformers.AdvertisementPageTransformer;
 import org.devon.app.exceptions.EmptyFieldException;
-import org.devon.app.mapper.TransformerMapper;
+import org.devon.app.mapper.TransformerMapperM;
+import org.devon.app.mapper.TransformerMapperT;
 import org.devon.app.repositories.AdvertisementPageRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -24,22 +26,25 @@ public class IntegrationServiceM extends AIntegrationService {
     private static Logger LOG = LoggerFactory
             .getLogger(IntegrationServiceM.class);
 
+    TransformerMapperM transformerMapperM;
+
     @Autowired
     public IntegrationServiceM(AdvertisementPageRepository advertisementPageRepository,
                                ModelMapper modelMapper,
                                AdvertisementPageComparator advertisementPageComparator,
                                ConsoleInteractions consoleInteractions,
-                               TransformerMapper transformerMapper) {
+                               TransformerMapperM transformerMapperM) {
         this.advertisementPageRepository = advertisementPageRepository;
         this.modelMapper = modelMapper;
         this.advertisementPageComparator = advertisementPageComparator;
         this.consoleInteractions = consoleInteractions;
-        this.transformerMapper = transformerMapper;
+        this.transformerMapperM = transformerMapperM;
     }
 
     @Override
-    public void mapDtoToTransformer(RawDataTDto rawDataTDto) {
-
+    public <E extends RawDataDto> void mapDtoToTransformer(E rawDataMDto) {
+        AdvertisementPageMTransformer advertisementPageMTransformer = transformerMapperM.rawDataMDtoToAdvertisementPageMTransformer((RawDataMDto) rawDataMDto);
+        validateTransformerAndPersist(advertisementPageMTransformer, IS_FROM_INTEGRATION_ENDPOINT);
     }
 
     @Override
